@@ -1,5 +1,18 @@
 <template>
   <div class="row justify-center" style="height: 250px">
+    <div>
+      <q-card dark bordered class="bg-grey-9 my-card">
+        <q-card-section class="text-center">
+          <div class="text-h6">AQUILA</div>
+        </q-card-section>
+
+        <q-separator dark inset />
+
+        <q-card-section>
+          {{ subTitle }}
+        </q-card-section>
+      </q-card>
+    </div>
     <div class="content col-4">
       <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <q-input
@@ -19,24 +32,32 @@
           :rules="[(val) => (val && val.length > 0) || 'Please type something']"
         />
 
-        <q-toggle v-model="accept" label="I accept the license and terms" />
-
-        <div>
-          <q-btn
-            label="Submit"
-            type="submit"
-            color="primary"
-            flat
-            class="q-ml-sm"
-          />
-        </div>
+        <q-toggle v-model="accept" label="Save credentials?" />
       </q-form>
+      <div>
+        <q-btn
+          label="Submit"
+          type="submit"
+          color="primary"
+          flat
+          class="center"
+        />
+      </div>
     </div>
   </div>
 </template>
 <style lang="scss">
+.q-btn {
+  margin-top: 100px;
+}
+.my-card {
+  margin-top: 6em;
+  width: 100%;
+  max-width: 250px;
+}
 .content {
-  margin: 228px;
+  margin: 450px;
+  position: absolute;
 }
 </style>
 <script>
@@ -55,7 +76,7 @@ export default {
       name,
       age,
       accept,
-
+      subTitle: "Otimizando suas ordens com agilidade e referência!",
       onSubmit() {
         if (accept.value !== true) {
           $q.notify({
