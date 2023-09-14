@@ -1,9 +1,22 @@
 import { defineAsyncComponent } from "vue";
 
+const MainLayout = defineAsyncComponent(() => import("layouts/MainLayout.vue"));
+const StoreUserPage = defineAsyncComponent(() =>
+  import("pages/StoreUserPage.vue")
+);
+const StoreOsPage = defineAsyncComponent(() => import("pages/StoreOsPage.vue"));
+const UpdateUserPage = defineAsyncComponent(() =>
+  import("pages/UpdateUserPage.vue")
+);
+const ServiceHistoryPage = defineAsyncComponent(() =>
+  import("pages/ServiceHistoryPage.vue")
+);
+const StockPage = defineAsyncComponent(() => import("pages/StockPage.vue"));
+
 const routes = [
   {
     path: "",
-    component: defineAsyncComponent(() => import("pages/StoreUserPage.vue")),
+    component: StoreUserPage,
     //component: () => import("layouts/LoginLayout.vue"),
     // children: [
     // { path: "/", component: () => import("pages/StoreUserPage.vue") },
@@ -11,22 +24,20 @@ const routes = [
   },
   {
     path: "/",
-    component: () => import("layouts/MainLayout.vue"),
+    component: MainLayout,
     children: [
       {
         path: "create-os",
-        component: defineAsyncComponent(() => import("pages/StoreOsPage.vue")),
+        component: StoreOsPage,
       },
       {
         path: "os-history",
-        component: defineAsyncComponent(() =>
-          import("pages/ServiceHistoryPage.vue")
-        ),
+        component: ServiceHistoryPage,
       },
-      { path: "user", component: () => import("pages/UpdateUserPage.vue") },
+      { path: "user", component: UpdateUserPage },
       {
         path: "stock",
-        component: defineAsyncComponent(() => import("pages/StockPage.vue")),
+        component: StockPage,
       },
     ],
   },
