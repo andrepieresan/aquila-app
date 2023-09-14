@@ -1,7 +1,7 @@
 <template>
-  <div class="row justify-center" style="height: 250px">
-    <div>
-      <q-card dark bordered class="bg-grey-9 my-card">
+  <div class="loginForm">
+    <div class="content">
+      <q-card dark bordered class="bg-grey-9">
         <q-card-section class="text-center">
           <div class="text-h6">AQUILA</div>
         </q-card-section>
@@ -12,9 +12,7 @@
           {{ subTitle }}
         </q-card-section>
       </q-card>
-    </div>
-    <div class="content col-4">
-      <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+      <q-form @submit="onSubmit" @reset="onReset" class="q-mt-xl q-gutter-md">
         <q-input
           filled
           v-model="name"
@@ -34,30 +32,32 @@
 
         <q-toggle v-model="accept" label="Save credentials?" />
       </q-form>
-      <div>
-        <q-btn
-          label="Submit"
-          type="submit"
-          color="primary"
-          flat
-          class="center"
-        />
-      </div>
+      <q-btn
+        label="Submit"
+        type="submit"
+        color="primary"
+        flat
+        class="q-mt-xl"
+      />
     </div>
   </div>
 </template>
 <style lang="scss">
-.q-btn {
-  margin-top: 100px;
-}
-.my-card {
+.loginForm {
   margin-top: 6em;
-  width: 100%;
-  max-width: 250px;
+  display: flex;
+  justify-content: center;
 }
 .content {
-  margin: 450px;
-  position: absolute;
+  padding: 45px;
+  background-color: rgba(127, 127, 129, 0.774);
+  min-height: 600px;
+  min-width: 450px;
+  max-width: 450px;
+  margin: 2em;
+}
+body {
+  background-color: antiquewhite;
 }
 </style>
 <script>

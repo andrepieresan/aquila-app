@@ -1,76 +1,126 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated dark>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+  <div class="q-pa-md" style="margin: 1em">
+    <q-layout
+      view="lHh Lpr lff"
+      container
+      style="height: 90vh"
+      class="shadow-2 rounded-borders"
+    >
+      <q-header elevated style="background-color: rgba(108, 136, 161, 0.637)">
+        <q-toolbar>
+          <q-toolbar-title class="text-center"
+            >Ordem de Serviço</q-toolbar-title
+          >
+          <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
+        </q-toolbar>
+      </q-header>
 
-        <q-toolbar-title> AQUILA </q-toolbar-title>
+      <q-drawer
+        v-model="drawer"
+        show-if-above
+        :width="200"
+        :breakpoint="400"
+        style="background-color: rgba(108, 136, 161, 0.637)"
+      >
+        <q-scroll-area
+          style="
+            height: calc(100% - 150px);
+            margin-top: 150px;
+            border-right: 1px solid #ddd;
+          "
+        >
+          <q-list>
+            <q-item
+              to="/os-history"
+              clickable
+              v-ripple
+              :active="link === 'today'"
+              @click="link = 'today'"
+              active-class="menu-link"
+            >
+              <q-item-section avatar>
+                <q-icon name="today" />
+              </q-item-section>
 
-        <div>v0.0.1</div>
-      </q-toolbar>
-    </q-header>
+              <q-item-section>Atendimentos</q-item-section>
+            </q-item>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+            <q-item
+              to="/create-os"
+              clickable
+              v-ripple
+              :active="link === 'send'"
+              @click="link = 'send'"
+              active-class="menu-link"
+            >
+              <q-item-section avatar>
+                <q-icon name="send" />
+              </q-item-section>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
+              <q-item-section>Abrir OS</q-item-section>
+            </q-item>
 
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+            <q-item
+              to="/stock"
+              clickable
+              v-ripple
+              :active="link === 'find_in_page'"
+              @click="link = 'find_in_page'"
+              active-class="menu-link"
+            >
+              <q-item-section avatar>
+                <q-icon name="find_in_page" />
+              </q-item-section>
+
+              <q-item-section>Estoque</q-item-section>
+            </q-item>
+
+            <q-item
+              to="/user"
+              clickable
+              v-ripple
+              :active="link === 'supervisor_account'"
+              @click="link = 'supervisor_account'"
+              active-class="menu-link"
+            >
+              <q-item-section avatar>
+                <q-icon name="supervisor_account" />
+              </q-item-section>
+
+              <q-item-section>Perfil</q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
+
+        <div id="userInfo" class="absolute-top">
+          <div class="text-weight-bold">{{ userName }}</div>
+          <div>{{ userRole }}</div>
+        </div>
+      </q-drawer>
+
+      <q-page-container>
+        <q-page padding><router-view /></q-page>
+      </q-page-container>
+    </q-layout>
+  </div>
 </template>
+<style lang="scss">
+.menu-link {
+  color: #000;
+  background: #5e5c5c7c;
+}
+</style>
 
 <script>
-import { defineComponent, ref } from "vue";
-import EssentialLink from "components/EssentialLink.vue";
+import { ref } from "vue";
 
-const linksList = [
-  {
-    title: "Github",
-    caption: "github.com/andrepieresan",
-    icon: "code",
-    link: "https://github.com/andrepieresan",
-  },
-  {
-    title: "[em teste]Discord Chat Channel",
-    caption: "chat.quasar.dev",
-    icon: "chat",
-    link: "https://chat.quasar.dev",
-  },
-];
-
-export default defineComponent({
-  name: "MainLayout",
-
-  components: {
-    EssentialLink,
-  },
-
+export default {
   setup() {
-    const leftDrawerOpen = ref(false);
-
     return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value;
-      },
+      userName: "testando",
+      userRole: "tastanddooo",
+      link: ref(""),
     };
   },
-});
+};
 </script>

@@ -18,8 +18,8 @@ module.exports = configure(function (/* ctx */) {
       // include: [],
       // exclude: [],
       // rawOptions: {},
-      warnings: true,
-      errors: true,
+      warnings: false,
+      errors: false,
     },
 
     // https://v2.quasar.dev/quasar-cli/prefetch-feature
@@ -50,8 +50,8 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
       target: {
-        browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
-        node: "node16",
+        browser: ["es2020", "safari14"],
+        node: "node18",
       },
 
       vueRouterMode: "hash", // available values: 'hash', 'history'
@@ -95,7 +95,7 @@ module.exports = configure(function (/* ctx */) {
     devServer: {
       port: 9090,
       host: "127.0.0.0",
-      https: true,
+      // https: true,
       open: false, // opens browser window automatically
     },
 
