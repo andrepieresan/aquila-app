@@ -1,0 +1,181 @@
+<template>
+  <q-table
+    class="my-sticky-header-last-column-table"
+    flat
+    bordered
+    :title="headerTitle"
+    :rows="rows"
+    :columns="columns"
+    row-key="name"
+  />
+</template>
+
+<script>
+const columns = [
+  {
+    name: "name",
+    required: true,
+    label: "Nome Cliente",
+    align: "left",
+    field: (row) => row.name,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "os_number",
+    align: "center",
+    label: "Número de Os",
+    field: "os_number",
+    sortable: true,
+  },
+  { name: "product", label: "Produto", field: "product", sortable: true },
+  { name: "close_at", label: "Fechado", field: "close_at" },
+  { name: "received_at", label: "Entrada", field: "received_at" },
+  {
+    name: "send_at",
+    label: "Saida",
+    field: "send_at",
+    sortable: true,
+    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
+  },
+];
+
+const rows = [
+  {
+    name: "ANDRE DEKO",
+    os_number: 159,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 151,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 152,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 153,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 154,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 155,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 156,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 157,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 158,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+  {
+    name: "ANDRE DEKO",
+    os_number: 159,
+    product: "NEXTEL",
+    close_at: "DD/MM/YYYY",
+    received_at: "DD/MM/YYYY",
+    send_at: "DD/MM/YYYY",
+  },
+];
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "MainTable",
+
+  props: {
+    headerTitle: {
+      type: String,
+    },
+  },
+
+  setup() {
+    return {
+      columns,
+      rows,
+    };
+  },
+});
+</script>
+
+<style lang="scss">
+.my-sticky-header-last-column-table {
+  // height: 310px;
+  // max-width: 600px;
+
+  td:last-child {
+    background-color: #00b4ff;
+  }
+  tr th {
+    position: sticky;
+    z-index: 2;
+    background: #00b4ff;
+  }
+  thead tr:last-child th {
+    top: 48px;
+    z-index: 3;
+  }
+  thead tr:first-child th {
+    top: 0;
+    z-index: 1;
+  }
+  tr:last-child th:last-child {
+    z-index: 3;
+  }
+  td:last-child {
+    z-index: 1;
+  }
+  td:last-child,
+  th:last-child {
+    position: sticky;
+    right: 0;
+  }
+  tbody {
+    scroll-margin-top: 48px;
+  }
+}
+</style>

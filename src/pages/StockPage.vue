@@ -1,6 +1,20 @@
-S
-<template><h1>stock page</h1></template>
+<template>
+  <MainTable class="main-table-content" />
+</template>
 <script>
-export default {};
+import MainTable from "src/components/MainTable.vue";
+export default {
+  components: { MainTable },
+  setup() {
+    return {
+      setup() {
+        return {
+          columns,
+          rows,
+        };
+      },
+    };
+  },
+};
 </script>
 <style lang="scss"></style>

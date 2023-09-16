@@ -1,5 +1,14 @@
 // app global css in SCSS form
 #userInfo {
+  // display: absolute;
   text-align: center;
-  margin: 4em;
+  align-items: baseline;
+  margin-top: 2em;
+  padding: 1em;
+  word-break: normal;
+}
+.main-table-content {
+  // background-color: aquamarine;
+  width: 100%;
+  height: 79vh;
 }

@@ -8,10 +8,16 @@
     >
       <q-header elevated style="background-color: rgba(108, 136, 161, 0.637)">
         <q-toolbar>
-          <q-toolbar-title class="text-center"
-            >Ordem de Serviço</q-toolbar-title
-          >
-          <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
+          <q-toolbar-title class="text-center">{{
+            headerTitle
+          }}</q-toolbar-title>
+          <q-btn
+            flat
+            @click="drawer ? (drawer = '') : (drawer = 'inbox')"
+            round
+            dense
+            icon="menu"
+          />
         </q-toolbar>
       </q-header>
 
@@ -34,8 +40,10 @@
               to="/os-history"
               clickable
               v-ripple
-              :active="link === 'today'"
-              @click="link = 'today'"
+              @click="
+                headerTitle = 'Atendimento';
+                drawer = 'inbox';
+              "
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -49,8 +57,10 @@
               to="/create-os"
               clickable
               v-ripple
-              :active="link === 'send'"
-              @click="link = 'send'"
+              @click="
+                headerTitle = 'Abrir Os';
+                drawer = 'inbox';
+              "
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -64,8 +74,10 @@
               to="/stock"
               clickable
               v-ripple
-              :active="link === 'find_in_page'"
-              @click="link = 'find_in_page'"
+              @click="
+                headerTitle = 'Estoque';
+                drawer = 'inbox';
+              "
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -79,8 +91,10 @@
               to="/user"
               clickable
               v-ripple
-              :active="link === 'supervisor_account'"
-              @click="link = 'supervisor_account'"
+              @click="
+                headerTitle = 'Perfil';
+                drawer = 'inbox';
+              "
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -104,6 +118,7 @@
     </q-layout>
   </div>
 </template>
+
 <style lang="scss">
 .menu-link {
   color: #000;
@@ -113,13 +128,13 @@
 
 <script>
 import { ref } from "vue";
-
 export default {
   setup() {
     return {
-      userName: "testando",
-      userRole: "tastanddooo",
-      link: ref(""),
+      drawer: ref(""),
+      userName: "ADONIS",
+      userRole: "technical assistance \nmanager",
+      headerTitle: ref("Atendimentos"),
     };
   },
 };
