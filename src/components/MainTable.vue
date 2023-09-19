@@ -7,7 +7,33 @@
     :rows="rows"
     :columns="columns"
     row-key="name"
-  />
+    @row-click="layout = true"
+  >
+    <template v-slot:body-cell-actions="props">
+      <q-tr :props="props">
+        <q-td key="name" :props="props">
+          {{ props.row.name }}
+        </q-td>
+        <q-td key="os_number" :props="props">
+          {{ props.row.os_number }}
+        </q-td>
+        <q-td key="product" :props="props">
+          <div class="text-pre-wrap">{{ props.row.product }}</div>
+        </q-td>
+        <q-td key="close_at" :props="props">
+          {{ props.row.close_at }}
+        </q-td>
+        <q-td key="received_at" :props="props">
+          {{ props.row.received_at }}
+        </q-td>
+        <q-td key="send_at" :props="props">
+          {{ props.row.send_at }}
+        </q-td>
+      </q-tr>
+    </template>
+  </q-table>
+
+  <Modal v-model="layout" title="Editar ordem de serviço" />
 </template>
 
 <script>
@@ -122,23 +148,26 @@ const rows = [
     send_at: "DD/MM/YYYY",
   },
 ];
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import Modal from "./Modal.vue";
 
 export default defineComponent({
   name: "MainTable",
-
   props: {
     headerTitle: {
       type: String,
     },
   },
-
   setup() {
     return {
+      layout: ref(false),
       columns,
       rows,
     };
   },
+  components: { Modal },
+
+  methods: {},
 });
 </script>
 
