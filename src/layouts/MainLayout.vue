@@ -8,9 +8,6 @@
     >
       <q-header elevated style="background-color: rgba(108, 136, 161, 0.637)">
         <q-toolbar>
-          <q-toolbar-title class="text-center">{{
-            headerTitle
-          }}</q-toolbar-title>
           <q-btn
             flat
             @click="drawer ? (drawer = '') : (drawer = 'inbox')"
@@ -18,9 +15,24 @@
             dense
             icon="menu"
           />
+          <q-toolbar-title class="text-center">{{
+            headerTitle
+          }}</q-toolbar-title>
+          <q-btn
+            flat
+            @click="
+              modal = true;
+              drawer = 'inbox';
+            "
+            round
+            dense
+            icon="add_circle"
+          >
+          </q-btn>
         </q-toolbar>
       </q-header>
 
+      <Modal v-model="modal" title="Criar ordem de serviço" />
       <q-drawer
         v-model="drawer"
         show-if-above
@@ -127,15 +139,18 @@
 </style>
 
 <script>
+import Modal from "src/components/Modal.vue";
 import { ref } from "vue";
 export default {
   setup() {
     return {
+      modal: ref(false),
       drawer: ref(""),
       userName: "ADONIS",
       userRole: "technical assistance \nmanager",
       headerTitle: ref("Atendimentos"),
     };
   },
+  components: { Modal },
 };
 </script>
