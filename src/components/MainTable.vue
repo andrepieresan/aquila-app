@@ -7,10 +7,25 @@
     :rows="rows"
     :columns="columns"
     row-key="name"
-    @row-click="layout = true"
   >
-    <template v-slot:body-cell-actions="props">
+    <template v-slot:body="props">
       <q-tr :props="props">
+        <q-menu touch-position>
+          <q-list>
+            <!-- <q-item clickable>
+              <q-item-section>test#dados:{{ props.row }}</q-item-section>
+            </q-item> -->
+            <q-item v-close-popup clickable>
+              <q-item-section>Visualizar</q-item-section>
+            </q-item>
+            <q-item v-close-popup clickable>
+              <q-item-section @click="edit = true">Editar</q-item-section>
+            </q-item>
+            <q-item v-close-popup clickable>
+              <q-item-section>Finalizar</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
         <q-td key="name" :props="props">
           {{ props.row.name }}
         </q-td>
@@ -33,7 +48,7 @@
     </template>
   </q-table>
 
-  <Modal v-model="layout" title="Editar ordem de serviço" />
+  <Modal v-model="edit" title="Editar ordem de serviço" />
 </template>
 
 <script>
@@ -160,7 +175,7 @@ export default defineComponent({
   },
   setup() {
     return {
-      layout: ref(false),
+      edit: ref(false),
       columns,
       rows,
     };

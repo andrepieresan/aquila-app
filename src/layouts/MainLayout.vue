@@ -53,7 +53,7 @@
               clickable
               v-ripple
               @click="
-                headerTitle = 'Atendimento';
+                headerTitle = 'Lista de serviços';
                 drawer = 'inbox';
               "
               active-class="menu-link"
@@ -62,7 +62,7 @@
                 <q-icon name="today" />
               </q-item-section>
 
-              <q-item-section>Atendimentos</q-item-section>
+              <q-item-section>Lista de serviços</q-item-section>
             </q-item>
 
             <q-item
@@ -125,7 +125,7 @@
       </q-drawer>
 
       <q-page-container>
-        <q-page padding><router-view /></q-page>
+        <q-page><router-view /></q-page>
       </q-page-container>
     </q-layout>
   </div>
@@ -148,7 +148,7 @@ export default {
       drawer: ref(""),
       userName: "ADONIS",
       userRole: "technical assistance \nmanager",
-      headerTitle: ref("Atendimentos"),
+      headerTitle: ref("Lista de serviços"),
     };
   },
   components: { Modal },
