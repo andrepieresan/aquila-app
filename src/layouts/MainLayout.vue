@@ -18,21 +18,12 @@
           <q-toolbar-title class="text-center">{{
             headerTitle
           }}</q-toolbar-title>
-          <q-btn
-            flat
-            @click="
-              modal = true;
-              drawer = 'inbox';
-            "
-            round
-            dense
-            icon="add_circle"
-          >
+          <q-btn flat @click="modal = true" round dense icon="add_circle">
           </q-btn>
         </q-toolbar>
       </q-header>
 
-      <Modal v-model="modal" title="Criar ordem de serviço" />
+      <Modal v-model="modal" type="store" title="Criar ordem de serviço" />
       <q-drawer
         v-model="drawer"
         show-if-above
@@ -52,10 +43,7 @@
               to="/os-history"
               clickable
               v-ripple
-              @click="
-                headerTitle = 'Lista de serviços';
-                drawer = 'inbox';
-              "
+              @click="headerTitle = 'Lista de serviços'"
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -65,14 +53,11 @@
               <q-item-section>Lista de serviços</q-item-section>
             </q-item>
 
-            <q-item
+            <!-- <q-item
               to="/create-os"
               clickable
               v-ripple
-              @click="
-                headerTitle = 'Abrir Os';
-                drawer = 'inbox';
-              "
+              @click="headerTitle = 'Abrir Os'"
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -80,16 +65,13 @@
               </q-item-section>
 
               <q-item-section>Abrir OS</q-item-section>
-            </q-item>
+            </q-item> -->
 
             <q-item
               to="/stock"
               clickable
               v-ripple
-              @click="
-                headerTitle = 'Estoque';
-                drawer = 'inbox';
-              "
+              @click="headerTitle = 'Estoque'"
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -103,10 +85,7 @@
               to="/user"
               clickable
               v-ripple
-              @click="
-                headerTitle = 'Perfil';
-                drawer = 'inbox';
-              "
+              @click="headerTitle = 'Perfil'"
               active-class="menu-link"
             >
               <q-item-section avatar>

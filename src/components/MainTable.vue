@@ -10,7 +10,7 @@
   >
     <template v-slot:body="props">
       <q-tr :props="props">
-        <q-menu touch-position>
+        <q-menu v-if="popup" touch-position>
           <q-list>
             <!-- <q-item clickable>
               <q-item-section>test#dados:{{ props.row }}</q-item-section>
@@ -48,127 +48,25 @@
     </template>
   </q-table>
 
-  <Modal v-model="edit" title="Editar ordem de serviço" />
+  <Modal v-model="edit" type="edit" title="Editar ordem de serviço" />
 </template>
 
 <script>
-const columns = [
-  {
-    name: "name",
-    required: true,
-    label: "Nome Cliente",
-    align: "left",
-    field: (row) => row.name,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "os_number",
-    align: "center",
-    label: "Número de Os",
-    field: "os_number",
-    sortable: true,
-  },
-  { name: "product", label: "Produto", field: "product", sortable: true },
-  { name: "close_at", label: "Fechado", field: "close_at" },
-  { name: "received_at", label: "Entrada", field: "received_at" },
-  {
-    name: "send_at",
-    label: "Saida",
-    field: "send_at",
-    sortable: true,
-    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
-  },
-];
-
-const rows = [
-  {
-    name: "ANDRE DEKO",
-    os_number: 159,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 151,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 152,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 153,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 154,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 155,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 156,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 157,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 158,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-  {
-    name: "ANDRE DEKO",
-    os_number: 159,
-    product: "NEXTEL",
-    close_at: "DD/MM/YYYY",
-    received_at: "DD/MM/YYYY",
-    send_at: "DD/MM/YYYY",
-  },
-];
 import { defineComponent, ref } from "vue";
 import Modal from "./Modal.vue";
 
 export default defineComponent({
   name: "MainTable",
   props: {
+    popup: {
+      type: Boolean,
+    },
+    columns: {
+      type: Object,
+    },
+    rows: {
+      type: Object,
+    },
     headerTitle: {
       type: String,
     },
@@ -176,8 +74,6 @@ export default defineComponent({
   setup() {
     return {
       edit: ref(false),
-      columns,
-      rows,
     };
   },
   components: { Modal },
