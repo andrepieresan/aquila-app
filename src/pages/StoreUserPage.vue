@@ -15,7 +15,7 @@
       <q-form @submit="onSubmit" @reset="onReset" class="q-mt-xl q-gutter-md">
         <q-input
           filled
-          v-model="name"
+          v-model="form.email"
           label="Email"
           lazy-rules
           :rules="[(val) => (val && val.length > 0) || 'Please type something']"
@@ -25,20 +25,20 @@
           filled
           type="password"
           label="Password"
-          v-model="age"
+          v-model="form.pwd"
           lazy-rules
           :rules="[(val) => (val && val.length > 0) || 'Please type something']"
         />
 
         <q-toggle v-model="accept" label="Save credentials?" />
+        <q-btn
+          label="Submit"
+          type="submit"
+          color="primary"
+          flat
+          class="q-mt-xl"
+        />
       </q-form>
-      <q-btn
-        label="Submit"
-        type="submit"
-        color="primary"
-        flat
-        class="q-mt-xl"
-      />
     </div>
   </div>
 </template>
@@ -56,45 +56,55 @@
   max-width: 450px;
   margin: 2em;
 }
-body {
-  background-color: antiquewhite;
-}
 </style>
 <script>
 import { useQuasar } from "quasar";
+import { api } from "src/boot/axios";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const $q = useQuasar();
-
-    const name = ref(null);
-    const age = ref(null);
+    const $router = useRouter();
+    const form = ref({
+      email: "",
+      pwd: "",
+    });
     const accept = ref(false);
 
+    const getToken = async (email, pwd) => {
+      const data = { email, pwd };
+
+      return await api
+        .post("/login", data)
+        .then((res) => res?.data)
+        .catch((e) => {});
+    };
+
+    const onSubmit = async () => {
+      let { email, pwd } = form.value;
+
+      let { token } = await getToken(email, pwd);
+
+      if (!token) {
+        alert("sem autorizacao");
+        return true;
+      }
+
+      $q.localStorage.set("x-api", token);
+      $q.localStorage.set("x-access", pwd);
+
+      console.log(token);
+
+      $router.push("/os-history");
+    };
+
     return {
-      name,
-      age,
+      form,
       accept,
       subTitle: "Otimizando suas ordens com agilidade e referência!",
-      onSubmit() {
-        if (accept.value !== true) {
-          $q.notify({
-            color: "red-5",
-            textColor: "white",
-            icon: "warning",
-            message: "You need to accept the license and terms first",
-          });
-        } else {
-          $q.notify({
-            color: "green-4",
-            textColor: "white",
-            icon: "cloud_done",
-            message: "Submitted",
-          });
-        }
-      },
-
+      onSubmit,
       onReset() {
         name.value = null;
         age.value = null;

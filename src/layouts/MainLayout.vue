@@ -71,14 +71,14 @@
               to="/stock"
               clickable
               v-ripple
-              @click="headerTitle = 'Estoque'"
+              @click="headerTitle = 'Relatórios'"
               active-class="menu-link"
             >
               <q-item-section avatar>
                 <q-icon name="find_in_page" />
               </q-item-section>
 
-              <q-item-section>Estoque</q-item-section>
+              <q-item-section>Relatórios</q-item-section>
             </q-item>
 
             <q-item
