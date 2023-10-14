@@ -58,14 +58,13 @@
 }
 </style>
 <script>
-import { useQuasar } from "quasar";
-import { api } from "src/boot/axios";
 import { ref } from "vue";
+import { api } from "src/boot/axios";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "src/stores/Auth";
 
 export default {
   setup() {
-    const $q = useQuasar();
     const $router = useRouter();
     const form = ref({
       email: "",
@@ -73,29 +72,27 @@ export default {
     });
     const accept = ref(false);
 
-    const getToken = async (email, pwd) => {
-      const data = { email, pwd };
+    const getToken = async (email, password) => {
+      const data = { email, password };
 
       return await api
         .post("/login", data)
-        .then((res) => res?.data)
+        .then((res) => res?.data?.data)
         .catch((e) => {});
     };
 
     const onSubmit = async () => {
       let { email, pwd } = form.value;
 
-      let { token } = await getToken(email, pwd);
+      let { token, user_id } = await getToken(email, pwd);
 
+      console.log({ token, user_id });
       if (!token) {
         alert("sem autorizacao");
         return true;
       }
 
-      $q.localStorage.set("x-api", token);
-      $q.localStorage.set("x-access", pwd);
-
-      console.log(token);
+      useAuthStore().setCredentials(token, user_id);
 
       $router.push("/os-history");
     };
@@ -105,11 +102,6 @@ export default {
       accept,
       subTitle: "Otimizando suas ordens com agilidade e referência!",
       onSubmit,
-      onReset() {
-        name.value = null;
-        age.value = null;
-        accept.value = false;
-      },
     };
   },
 };

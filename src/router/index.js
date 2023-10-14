@@ -1,7 +1,12 @@
 import { route } from "quasar/wrappers";
 import { createRouter, createWebHistory } from "vue-router";
-import routes from "./routes";
 import { LocalStorage } from "quasar";
+import { api } from "src/boot/axios";
+import { useAuthStore } from "src/stores/Auth";
+import routes from "./routes";
+// import jwt from "jsonwebtoken";
+// import dotenv from "dotenv";
+// dotenv.config();
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -13,13 +18,11 @@ import { LocalStorage } from "quasar";
 
 export default route(function (/* { store, ssrContext } */) {
   const isAuthentic = async () => {
-    let data = LocalStorage.getItem("x-api");
-    console.log("alou", { data });
-    let { token } = await api
-      .post("/login", data)
-      .then((res) => res?.data)
-      .catch((e) => {});
-    if (!token) return false;
+    let { token } = LocalStorage.getItem("x-api");
+    console.log("alou", { token });
+    // jwt.verify(token, process.env.API_KEY);
+    // console.log("?:", { exist });
+    // if (!exist) return false;
     return true;
   };
 
@@ -33,12 +36,26 @@ export default route(function (/* { store, ssrContext } */) {
 
     history: createWebHistory(),
   });
+  ("__q_strn|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiJGJjcnlwdCR2PTk4JHI9MTAkSWV2czZON0I5N1kwV1BHVDd0Q1U5USQ1eFNLRGZWTi9kQ1RGUGcvcTZzQzMvY3I3a1VWWUw4IiwiaWF0IjoxNjk3MjU1MTgzLCJleHAiOjE2OTcyNTYwODN9.R-pYrObVKoj_Rm9FfdlNtFa7rZuxDrrEEthd_SlzpjQ");
+  Router.beforeEach(async (to, from, next) => {
+    if (!/login/gi.test(to.name)) {
+      try {
+        let storageToken = localStorage.getItem("x-api");
+        if (storageToken) {
+          let valid = await useAuthStore().checkToken;
 
-  Router.beforeEach((to, from) => {
-    if (!isAuthentic() && /home/gi.test(from.name)) {
-      console.log("chegou");
-      return false;
+          if (!valid) {
+            next("/login");
+          }
+          next();
+        }
+      } catch (e) {
+        console.log("aa", e.message);
+        next("/login");
+      }
     }
+    next();
+    // console.log(await isAuthentic());
   });
 
   return Router;

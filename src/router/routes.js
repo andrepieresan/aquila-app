@@ -15,7 +15,7 @@ const StockPage = defineAsyncComponent(() => import("pages/StockPage.vue"));
 
 const routes = [
   {
-    path: "",
+    path: "/login",
     name: "login",
     component: StoreUserPage,
     //component: () => import("layouts/LoginLayout.vue"),
@@ -25,7 +25,6 @@ const routes = [
   },
   {
     path: "/",
-    name: "home",
     component: MainLayout,
     children: [
       {
@@ -34,6 +33,7 @@ const routes = [
       },
       {
         path: "os-history",
+        name: "home",
         component: ServiceHistoryPage,
       },
       { path: "home", component: UpdateUserPage },
