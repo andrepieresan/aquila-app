@@ -61,10 +61,12 @@
 import { ref } from "vue";
 import { api } from "src/boot/axios";
 import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/Auth";
 
 export default {
   setup() {
+    const $q = useQuasar();
     const $router = useRouter();
     const form = ref({
       email: "",
@@ -87,12 +89,16 @@ export default {
       let { token, user_id } = await getToken(email, pwd);
 
       console.log({ token, user_id });
+
       if (!token) {
         alert("sem autorizacao");
         return true;
       }
 
       useAuthStore().setCredentials(token, user_id);
+
+      $q.cookies.set("xapi", token);
+      $q.cookies.set("xid", user_id);
 
       $router.push("/os-history");
     };

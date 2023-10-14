@@ -49,11 +49,16 @@
             <div style="float: left; width: 60%">
               <q-input
                 standout
-                v-model="form.branch_id"
+                v-model="form.branch_name"
                 label="Filial"
                 lazy-rules
               />
-              <q-input standout v-model="client.document" label="Documento" />
+              <q-input
+                standout
+                v-model="client.document"
+                :key="client.document"
+                label="Documento"
+              />
               <q-input standout v-model="client.mail" label="Endereço" />
             </div>
             <div style="float: right; width: 40%">
@@ -94,11 +99,11 @@
               v-close-popup
             /> -->
             <q-btn
+              v-close-popup
               flat
               type="submit"
               label="Salvar"
               color="primary"
-              v-close-popup
             />
           </q-card-actions>
         </q-form>
@@ -148,6 +153,7 @@
 
 <script>
 import { api } from "src/boot/axios";
+import { useAuthStore } from "src/stores/Auth";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -180,41 +186,63 @@ export default defineComponent({
       product: "",
       defect_obs: "",
       status: "",
-      created_by_user_id: "",
+      created_by_user_id: useAuthStore().user_id,
     });
-    const getClientList = async (name = "", phone = "") => {
-      if (!phone) {
+
+    const getClientData = async (name, phone) => {
+      try {
+        if (!name && !phone) {
+          return false;
+        }
         return await api
-          .get(`/client/${name}`)
+          .get(`/client/${name}/${phone}`, {
+            headers: {
+              Authorization: useAuthStore().token,
+              xid: useAuthStore().user_id,
+            },
+          })
           .then((res) => res?.data)
-          .catch((e) => console.log({ e }));
+          .catch((e) => {});
+      } catch (e) {
+        console.log("sem autenticacao");
       }
-      return await api
-        .get(`/client/${name}/${phone}`)
-        .then((res) => res?.data)
-        .catch((e) => console.log({ e }));
-    };
-    const searchClient = async () => {
-      let { name, phone } = client.value;
-      let clients = await getClientList(name, phone);
-      // let clients = [
-      //   { id: "", name: "aaa", phone: "", document: "", mail: "" },
-      //   { id: "", name: "bbb", phone: "", document: "", mail: "" },
-      //   { id: "", name: "cccc", phone: "", document: "", mail: "" },
-      // ];
-      console.log({ clients });
-      let c = clients.filter((c) => new RegExp(`${name}`).test(c.name));
-      // client.product.name = result.name;
-      // client.product.document = result.document;
-      // client.product.phone = result.phone;
-      // client.product.mail = result.mail;
-      console.log(client.value, { c });
     };
 
-    const onSave = () => {
+    const searchClient = async () => {
+      let { name, phone } = client.value;
+      let infoClient = await getClientData(name, phone);
+      console.log(infoClient);
+      if (!infoClient) {
+        alert("nao existe este cliente");
+        return false;
+      }
+
+      client.value.document = infoClient.document;
+      client.value.mail = infoClient.mail;
+      form.value.branch_name = infoClient.branch_name;
+      form.value.branch_id = infoClient.branch_id;
+      form.value.client_id = infoClient.client_id;
+      return;
+    };
+
+    const onSave = async () => {
       try {
-        form.value.product = `${brand.value} ${model.value}`;
-        console.log("xx", form.value);
+        const data = {
+          client_id: form.value.client_id,
+          branch_id: form.value.branch_id,
+          created_by: useAuthStore().user_id,
+          product: `${brand.value} ${model.value}`,
+          product_serial: form.value.product_serial,
+          status: form.value.status,
+          defect_obs: form.value.defect_obs,
+        };
+        console.log({ data });
+        return await api.post("/services/store", data, {
+          headers: {
+            Authorization: useAuthStore().token,
+            xid: useAuthStore().user_id,
+          },
+        });
       } catch (e) {
         let message = `Error: ${e.message}`;
         console.log(message);

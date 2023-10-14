@@ -26,23 +26,20 @@
             </q-item>
           </q-list>
         </q-menu>
-        <q-td key="name" :props="props">
-          {{ props.row.name }}
-        </q-td>
         <q-td key="os_number" :props="props">
           {{ props.row.os_number }}
+        </q-td>
+        <q-td key="client_name" :props="props">
+          {{ props.row.client_name }}
         </q-td>
         <q-td key="product" :props="props">
           <div class="text-pre-wrap">{{ props.row.product }}</div>
         </q-td>
-        <q-td key="close_at" :props="props">
-          {{ props.row.close_at }}
+        <q-td key="status" :props="props">
+          {{ props.row.status }}
         </q-td>
-        <q-td key="received_at" :props="props">
-          {{ props.row.received_at }}
-        </q-td>
-        <q-td key="send_at" :props="props">
-          {{ props.row.send_at }}
+        <q-td key="created_at" :props="props">
+          {{ props.row.created_at }}
         </q-td>
       </q-tr>
     </template>
