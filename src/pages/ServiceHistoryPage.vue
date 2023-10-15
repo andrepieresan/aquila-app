@@ -13,6 +13,8 @@
     </q-input>
 
     <MainTable
+      sortBy="os_number"
+      :rowsPerPage="10"
       :popup="true"
       :columns="columns"
       :rows="rows"
@@ -21,42 +23,46 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { api } from "src/boot/axios";
 import MainTable from "src/components/MainTable.vue";
 import { useAuthStore } from "src/stores/Auth";
-
-const columns = [
-  {
-    name: "os_number",
-    align: "center",
-    label: "Número de Os",
-    field: "os_number",
-    sortable: true,
-  },
-  {
-    name: "client_name",
-    label: "Nome Clientxe",
-    align: "left",
-  },
-  { name: "product", label: "Produto", field: "product", sortable: true },
-  { name: "status", label: "Status", field: "status" },
-  { name: "created_at", label: "Entrada", field: "received_at" },
-];
+import { date } from "quasar";
 
 export default {
   components: { MainTable },
 
+  methods: {},
+
   setup() {
     const rows = ref([]);
-    return {
-      rows,
-      columns,
-    };
-  },
-
-  methods: {
-    async getRows() {
+    const bus = inject("bus");
+    const columns = [
+      {
+        name: "client_name",
+        label: "Nome Cliente",
+        field: "client_name",
+        align: "center",
+      },
+      {
+        name: "os_number",
+        align: "center",
+        label: "Número de Os",
+        field: "os_number",
+        sortable: true,
+      },
+      { name: "product", label: "Produto", field: "product", align: "center" },
+      { name: "status", label: "Status", field: "status", align: "center" },
+      {
+        name: "created_at",
+        label: "Entrada",
+        field: "created_at",
+        align: "center",
+        sortable: true,
+        format: (value) => date.formatDate(value, `DD/MM/YYYY - HH:mm`),
+      },
+    ];
+    const getRows = async () => {
       let rows = await api
         .get("/services", {
           headers: {
@@ -68,7 +74,17 @@ export default {
         .catch((e) => {});
       console.log(rows);
       return rows;
-    },
+    };
+
+    bus.on("resetTableOs", async () => {
+      rows.value = await getRows();
+    });
+
+    return {
+      columns,
+      getRows,
+      rows,
+    };
   },
 
   async mounted() {

@@ -36,7 +36,6 @@ export default route(function (/* { store, ssrContext } */) {
 
     history: createWebHistory(),
   });
-  ("__q_strn|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiJGJjcnlwdCR2PTk4JHI9MTAkSWV2czZON0I5N1kwV1BHVDd0Q1U5USQ1eFNLRGZWTi9kQ1RGUGcvcTZzQzMvY3I3a1VWWUw4IiwiaWF0IjoxNjk3MjU1MTgzLCJleHAiOjE2OTcyNTYwODN9.R-pYrObVKoj_Rm9FfdlNtFa7rZuxDrrEEthd_SlzpjQ");
   Router.beforeEach(async (to, from, next) => {
     if (!/login/gi.test(to.name)) {
       try {

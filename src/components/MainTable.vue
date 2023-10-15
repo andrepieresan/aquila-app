@@ -6,60 +6,56 @@
     :title="headerTitle"
     :rows="rows"
     :columns="columns"
-    row-key="name"
+    :pagination="pagination"
   >
-    <template v-slot:body="props">
-      <q-tr :props="props">
-        <q-menu v-if="popup" touch-position>
-          <q-list>
-            <!-- <q-item clickable>
+    <template v-slot:header-cell="props">
+      <q-th :props="props">{{ props.col.label }} </q-th>
+    </template>
+
+    <template v-slot:body-cell="props">
+      <q-td :props="props">{{ props.value }} </q-td>
+      <q-menu v-if="popup" touch-position>
+        <q-list>
+          <!-- <q-item clickable>
               <q-item-section>test#dados:{{ props.row }}</q-item-section>
             </q-item> -->
-            <q-item v-close-popup clickable>
-              <q-item-section>Visualizar</q-item-section>
-            </q-item>
-            <q-item v-close-popup clickable>
-              <q-item-section @click="edit = true">Editar</q-item-section>
-            </q-item>
-            <q-item v-close-popup clickable>
-              <q-item-section>Finalizar</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-        <q-td key="os_number" :props="props">
-          {{ props.row.os_number }}
-        </q-td>
-        <q-td key="client_name" :props="props">
-          {{ props.row.client_name }}
-        </q-td>
-        <q-td key="product" :props="props">
-          <div class="text-pre-wrap">{{ props.row.product }}</div>
-        </q-td>
-        <q-td key="status" :props="props">
-          {{ props.row.status }}
-        </q-td>
-        <q-td key="created_at" :props="props">
-          {{ props.row.created_at }}
-        </q-td>
-      </q-tr>
+          <q-item v-close-popup clickable>
+            <q-item-section>Visualizar</q-item-section>
+          </q-item>
+          <q-item v-close-popup clickable>
+            <q-item-section @click="modal = true">Editar</q-item-section>
+          </q-item>
+          <q-item v-close-popup clickable>
+            <q-item-section>Finalizar</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
     </template>
   </q-table>
 
-  <Modal v-model="edit" type="edit" title="Editar ordem de serviço" />
+  <Modal v-model="modal" type="edit" title="Editar ordem de serviço" />
 </template>
 
 <script>
 import { defineComponent, ref } from "vue";
 import Modal from "./Modal.vue";
+import dayjs from "dayjs";
 
 export default defineComponent({
   name: "MainTable",
+  components: { Modal },
   props: {
+    sortBy: {
+      type: String,
+    },
+    rowsPerPage: {
+      type: Number,
+    },
     popup: {
       type: Boolean,
     },
     columns: {
-      type: Object,
+      type: Array,
     },
     rows: {
       type: Object,
@@ -68,12 +64,17 @@ export default defineComponent({
       type: String,
     },
   },
-  setup() {
+  setup(props) {
     return {
-      edit: ref(false),
+      pagination: {
+        sortBy: props.sortBy,
+        descending: true,
+        page: 1,
+        rowsPerPage: props.rowsPerPage,
+      },
+      modal: ref(false),
     };
   },
-  components: { Modal },
 
   methods: {},
 });
@@ -85,6 +86,9 @@ export default defineComponent({
   // max-width: 600px;
 
   td:last-child {
+    background-color: #00b4ff;
+  }
+  td:first-child {
     background-color: #00b4ff;
   }
   tr th {

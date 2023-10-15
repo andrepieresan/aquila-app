@@ -68,7 +68,7 @@
             </q-item> -->
 
             <q-item
-              to="/stock"
+              to="/report"
               clickable
               v-ripple
               @click="headerTitle = 'Relatórios'"
@@ -119,11 +119,17 @@
 
 <script>
 import Modal from "src/components/Modal.vue";
-import { ref } from "vue";
+import { ref, inject } from "vue";
 export default {
   setup() {
+    const modal = ref(false);
+    const bus = inject("bus");
+    bus.on("close", () => {
+      modal.value = false;
+    });
     return {
-      modal: ref(false),
+      bus,
+      modal,
       drawer: ref(""),
       userName: "ADONIS",
       userRole: "technical assistance \nmanager",

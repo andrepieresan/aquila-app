@@ -1,5 +1,5 @@
 <template>
-  <q-dialog>
+  <q-dialog v-model="showModal" persistent>
     <q-card style="max-width: 70vw">
       <q-card-section>
         <div style="padding: 0.5em" class="text-center text-h4">
@@ -53,12 +53,7 @@
                 label="Filial"
                 lazy-rules
               />
-              <q-input
-                standout
-                v-model="client.document"
-                :key="client.document"
-                label="Documento"
-              />
+              <q-input standout v-model="client.document" label="Documento" />
               <q-input standout v-model="client.mail" label="Endereço" />
             </div>
             <div style="float: right; width: 40%">
@@ -98,13 +93,7 @@
               color="primary"
               v-close-popup
             /> -->
-            <q-btn
-              v-close-popup
-              flat
-              type="submit"
-              label="Salvar"
-              color="primary"
-            />
+            <q-btn flat type="submit" label="Salvar" color="primary" />
           </q-card-actions>
         </q-form>
       </q-card-section>
@@ -152,10 +141,11 @@
 </template>
 
 <script>
+import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 import { useAuthStore } from "src/stores/Auth";
-import { defineComponent, ref } from "vue";
-
+import { useClientStore } from "src/stores/Client";
+import { inject, defineComponent, ref } from "vue";
 export default defineComponent({
   name: "Modal",
   props: {
@@ -170,6 +160,9 @@ export default defineComponent({
     },
   },
   setup() {
+    const bus = inject("bus");
+    const $q = useQuasar();
+    const showModal = ref(false);
     const clients = ref([]);
     const model = ref("");
     const brand = ref("");
@@ -186,8 +179,23 @@ export default defineComponent({
       product: "",
       defect_obs: "",
       status: "",
+      product_serial: "",
       created_by_user_id: useAuthStore().user_id,
     });
+
+    const clearForms = () => {
+      client.value = { id: "", name: "", phone: "", document: "", mail: "" };
+      form.value = {
+        client_id: "",
+        branch_id: "",
+        product: "",
+        defect_obs: "",
+        status: "",
+        product_serial: "",
+      };
+      brand.value = "";
+      model.value = "";
+    };
 
     const getClientData = async (name, phone) => {
       try {
@@ -195,7 +203,7 @@ export default defineComponent({
           return false;
         }
         return await api
-          .get(`/client/${name}/${phone}`, {
+          .get(`/client/${phone}`, {
             headers: {
               Authorization: useAuthStore().token,
               xid: useAuthStore().user_id,
@@ -209,47 +217,115 @@ export default defineComponent({
     };
 
     const searchClient = async () => {
-      let { name, phone } = client.value;
-      let infoClient = await getClientData(name, phone);
-      console.log(infoClient);
-      if (!infoClient) {
-        alert("nao existe este cliente");
-        return false;
-      }
+      try {
+        let { name, phone } = client.value;
 
-      client.value.document = infoClient.document;
-      client.value.mail = infoClient.mail;
-      form.value.branch_name = infoClient.branch_name;
-      form.value.branch_id = infoClient.branch_id;
-      form.value.client_id = infoClient.client_id;
-      return;
+        useClientStore().clear();
+
+        if (!name && !phone) {
+          $q.notify({
+            type: "warning",
+            position: "top",
+            message: "Preencha telefone para encontrar o cliente",
+            timeout: 1500,
+          });
+          return;
+        }
+
+        let infoClient = await getClientData(name, phone);
+
+        if (infoClient) {
+          client.value.document = infoClient.document;
+          client.value.mail = infoClient.mail;
+          // form.value.branch_name = infoClient.branch_name;
+          client.value.name = infoClient.client_name;
+          client.value.phone = infoClient.phone;
+
+          useClientStore().setClient({
+            branch_id: infoClient.branch_id,
+            client_id: infoClient.client_id,
+            name: infoClient.client_name,
+            phone,
+            document: infoClient.document,
+            mail: infoClient.mail,
+          });
+
+          return $q.notify({
+            type: "positive",
+            position: "top",
+            message: "Cliente encontrado",
+            timeout: 1500,
+          });
+        }
+
+        $q.notify({
+          type: "negative",
+          position: "top",
+          message: "Cliente não cadastrado",
+          timeout: 1500,
+        });
+      } catch (e) {}
     };
 
     const onSave = async () => {
       try {
-        const data = {
-          client_id: form.value.client_id,
-          branch_id: form.value.branch_id,
+        if (useClientStore().client.client_id === "") {
+          let clientData = {
+            name: client.value.name,
+            phone: client.value.phone,
+            document: client.value.document,
+            mail: client.value.mail,
+          };
+          await api
+            .post("/client/store", clientData, {
+              headers: {
+                Authorization: useAuthStore().token,
+                xid: useAuthStore().user_id,
+              },
+            })
+            .then((res) => {
+              let client_id = res?.data?.id;
+              useClientStore().setClientId(client_id);
+              return;
+            });
+        }
+        let osData = {
+          client_id: useClientStore().client.client_id,
+          branch_id: useClientStore().client.branch_id,
           created_by: useAuthStore().user_id,
           product: `${brand.value} ${model.value}`,
           product_serial: form.value.product_serial,
           status: form.value.status,
           defect_obs: form.value.defect_obs,
         };
-        console.log({ data });
-        return await api.post("/services/store", data, {
+        await api.post("/services/store", osData, {
           headers: {
             Authorization: useAuthStore().token,
             xid: useAuthStore().user_id,
           },
         });
+        $q.notify({
+          type: "positive",
+          position: "center",
+          message: "Ordem de serviço criada",
+          timeout: 1500,
+        });
+        bus.emit("close");
+        bus.emit("resetTableOs");
+        clearForms();
       } catch (e) {
-        let message = `Error: ${e.message}`;
-        console.log(message);
-        console.log(e.stack);
+        $q.notify({
+          type: "negative",
+          position: "center",
+          message: "Revise os campos",
+          timeout: 1500,
+        });
       }
     };
     return {
+      newClient: ref(true),
+      showModal,
+      bus,
       model,
       brand,
       form,

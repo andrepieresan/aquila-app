@@ -11,7 +11,7 @@ const UpdateUserPage = defineAsyncComponent(() =>
 const ServiceHistoryPage = defineAsyncComponent(() =>
   import("pages/ServiceHistoryPage.vue")
 );
-const StockPage = defineAsyncComponent(() => import("pages/StockPage.vue"));
+const ReportPage = defineAsyncComponent(() => import("pages/ReportPage.vue"));
 
 const routes = [
   {
@@ -38,8 +38,8 @@ const routes = [
       },
       { path: "home", component: UpdateUserPage },
       {
-        path: "stock",
-        component: StockPage,
+        path: "report",
+        component: ReportPage,
       },
     ],
   },
