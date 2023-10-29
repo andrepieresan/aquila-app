@@ -11,7 +11,12 @@
     <template v-slot:header-cell="props">
       <q-th :props="props">{{ props.col.label }} </q-th>
     </template>
-
+    <template v-slot:loading="props">
+      <q-inner-loading>
+        <q-spinner-gears size="50px" color="primary" />
+      </q-inner-loading>
+    </template>
+    <template v-slot:no-data="props"> </template>
     <template v-slot:body-cell="props">
       <q-td :props="props">{{ props.value }} </q-td>
       <q-menu v-if="popup" touch-position>
@@ -20,10 +25,14 @@
               <q-item-section>test#dados:{{ props.row }}</q-item-section>
             </q-item> -->
           <q-item v-close-popup clickable>
-            <q-item-section>Visualizar</q-item-section>
+            <q-item-section @click="visualizer(props.row.os_number)"
+              >Visualizar</q-item-section
+            >
           </q-item>
           <q-item v-close-popup clickable>
-            <q-item-section @click="modal = true">Editar</q-item-section>
+            <q-item-section @click="edit(props.row.os_number)"
+              >Editar</q-item-section
+            >
           </q-item>
           <q-item v-close-popup clickable>
             <q-item-section>Finalizar</q-item-section>
@@ -32,14 +41,13 @@
       </q-menu>
     </template>
   </q-table>
-
   <Modal v-model="modal" type="edit" title="Editar ordem de serviço" />
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, inject } from "vue";
 import Modal from "./Modal.vue";
-import dayjs from "dayjs";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "MainTable",
@@ -65,14 +73,24 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const router = useRouter();
+    let modal = ref(false);
+    const edit = (id) => {
+      router.push({ name: `os-edit`, params: { id } });
+    };
+    const visualizer = (id) => {
+      router.push({ name: `os-card`, params: { id } });
+    };
     return {
+      modal,
+      edit,
+      visualizer,
       pagination: {
         sortBy: props.sortBy,
         descending: true,
         page: 1,
         rowsPerPage: props.rowsPerPage,
       },
-      modal: ref(false),
     };
   },
 

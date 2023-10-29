@@ -1,7 +1,6 @@
 {
   "name": "aquila-project",
   "version": "0.0.1",
-  "type": "module",
   "description": "quickly and truly refer to crypto orders",
   "productName": "Aquila",
   "author": "k0d3",

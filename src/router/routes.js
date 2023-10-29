@@ -4,14 +4,26 @@ const MainLayout = defineAsyncComponent(() => import("layouts/MainLayout.vue"));
 const StoreUserPage = defineAsyncComponent(() =>
   import("pages/StoreUserPage.vue")
 );
+
 const StoreOsPage = defineAsyncComponent(() => import("pages/StoreOsPage.vue"));
+
 const UpdateUserPage = defineAsyncComponent(() =>
   import("pages/UpdateUserPage.vue")
 );
+
 const ServiceHistoryPage = defineAsyncComponent(() =>
   import("pages/ServiceHistoryPage.vue")
 );
+
 const ReportPage = defineAsyncComponent(() => import("pages/ReportPage.vue"));
+
+const OsEdit = defineAsyncComponent(() =>
+  import("components/utils/CardEditOs.vue")
+);
+
+const OsCard = defineAsyncComponent(() =>
+  import("components/utils/CardOs.vue")
+);
 
 const routes = [
   {
@@ -33,8 +45,18 @@ const routes = [
       },
       {
         path: "os-history",
-        name: "home",
+        name: "os-history",
         component: ServiceHistoryPage,
+      },
+      {
+        path: "os-history/:id",
+        name: "os-card",
+        component: OsCard,
+      },
+      {
+        path: "os-edit/:id",
+        name: "os-edit",
+        component: OsEdit,
       },
       { path: "home", component: UpdateUserPage },
       {

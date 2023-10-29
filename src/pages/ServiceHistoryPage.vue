@@ -4,7 +4,7 @@
       class="search"
       rounded
       outlined
-      v-model="text"
+      v-model="search"
       label="Pesquisar cliente, loja ou número de os"
     >
       <template v-slot:append>
@@ -16,7 +16,7 @@
       sortBy="os_number"
       :rowsPerPage="10"
       :popup="true"
-      :columns="columns"
+      :columns="setColumns()"
       :rows="rows"
       class="main-table-content"
     />
@@ -28,40 +28,68 @@ import { api } from "src/boot/axios";
 import MainTable from "src/components/MainTable.vue";
 import { useAuthStore } from "src/stores/Auth";
 import { date } from "quasar";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 export default {
   components: { MainTable },
 
-  methods: {},
-
+  methods: {
+    async filterRows(text) {
+      this.rows = (this.rows || []).filter((os) => {
+        if (
+          new RegExp(`${text}`, `gi`).test(os.client_name) ||
+          new RegExp(`${text}`, `gi`).test(os.os_number) ||
+          new RegExp(`${text}`, `gi`).test(os.branch_name)
+        ) {
+          return os;
+        }
+      });
+      if (!text) {
+        this.rows = await this.getRows();
+      }
+    },
+    setColumns() {
+      return [
+        {
+          name: "client_name",
+          label: "Nome Cliente",
+          field: "client_name",
+          align: "center",
+        },
+        {
+          name: "os_number",
+          align: "center",
+          label: "Número de Os",
+          field: "os_number",
+        },
+        {
+          name: "product",
+          label: "Produto",
+          field: "product",
+          align: "center",
+        },
+        {
+          name: "branch_name",
+          label: "Filial",
+          field: "branch_name",
+          align: "center",
+        },
+        { name: "status", label: "Status", field: "status", align: "center" },
+        {
+          name: "created_at",
+          label: "Entrada",
+          field: "created_at",
+          align: "center",
+        },
+      ];
+    },
+  },
   setup() {
+    const search = ref("");
     const rows = ref([]);
     const bus = inject("bus");
-    const columns = [
-      {
-        name: "client_name",
-        label: "Nome Cliente",
-        field: "client_name",
-        align: "center",
-      },
-      {
-        name: "os_number",
-        align: "center",
-        label: "Número de Os",
-        field: "os_number",
-        sortable: true,
-      },
-      { name: "product", label: "Produto", field: "product", align: "center" },
-      { name: "status", label: "Status", field: "status", align: "center" },
-      {
-        name: "created_at",
-        label: "Entrada",
-        field: "created_at",
-        align: "center",
-        sortable: true,
-        format: (value) => date.formatDate(value, `DD/MM/YYYY - HH:mm`),
-      },
-    ];
+
     const getRows = async () => {
       let rows = await api
         .get("/services", {
@@ -72,7 +100,6 @@ export default {
         })
         .then((res) => res.data)
         .catch((e) => {});
-      console.log(rows);
       return rows;
     };
 
@@ -81,14 +108,18 @@ export default {
     });
 
     return {
-      columns,
+      search,
       getRows,
       rows,
     };
   },
-
   async mounted() {
     this.rows = await this.getRows();
+  },
+  watch: {
+    search(text) {
+      this.filterRows(text);
+    },
   },
 };
 </script>
