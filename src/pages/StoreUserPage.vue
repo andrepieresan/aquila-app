@@ -12,7 +12,7 @@
           {{ subTitle }}
         </q-card-section>
       </q-card>
-      <q-form @submit="onSubmit" @reset="onReset" class="q-mt-xl q-gutter-md">
+      <q-form @submit="onSubmit" class="q-mt-xl q-gutter-md">
         <q-input
           filled
           v-model="form.email"

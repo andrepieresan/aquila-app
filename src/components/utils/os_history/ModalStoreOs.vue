@@ -18,7 +18,12 @@
               v-model="client.phone"
               label="Telefone"
             />
-            <q-btn style="width: 10%" @click="searchClient" color="primary" />
+            <q-btn
+              id="save-btn"
+              icon="saved_search"
+              @click="searchClient"
+              color="primary"
+            />
           </div>
         </div>
         <div style="float: left; width: 60%">
@@ -127,6 +132,7 @@ export default defineComponent({
         if (!name && !phone) {
           return false;
         }
+        // name = name.replace("", "-");
         return await api
           .get(`/client/${phone}/${name}`, {
             headers: {
@@ -201,7 +207,7 @@ export default defineComponent({
             mail: client.value.mail,
           };
           await api
-            .post("/client/store", clientData, {
+            .post("/client", clientData, {
               headers: {
                 Authorization: useAuthStore().token,
                 xid: useAuthStore().user_id,
@@ -224,7 +230,7 @@ export default defineComponent({
 
         let osData = {
           client_id: useClientStore().client.client_id,
-          branch_id,
+          branch_id: branch_id.id,
           created_by: useAuthStore().user_id,
           product: `${brand.value} ${model.value}`,
           product_serial: form.value.product_serial,
@@ -307,6 +313,12 @@ export default defineComponent({
   }
   .q-select {
     padding: 0.7em 1em;
+  }
+  #save-btn {
+    margin: 1.4em 0.3em;
+    // margin-left: 40px;
+    width: 20px;
+    height: 20px;
   }
 }
 </style>

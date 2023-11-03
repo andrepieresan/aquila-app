@@ -1,6 +1,6 @@
 <template>
   <q-card-section class="modalContent">
-    <q-form @submit="onSave" @reset="onReset" style="height: 75vh; width: 60vw">
+    <q-form @submit="onSave" style="height: 75vh; width: 60vw">
       <div class="forms">
         <div style="margin-top: 1em; float: top">
           <div style="display: flex">

@@ -8,7 +8,7 @@
       </q-card-section>
 
       <q-separator />
-      <ModalStoreOs v-if="/store/gi.test(type)" />
+      <ModalStoreOs />
     </q-card>
   </q-dialog>
 </template>
@@ -19,7 +19,7 @@ import { api } from "src/boot/axios";
 import { useAuthStore } from "src/stores/Auth";
 import { useClientStore } from "src/stores/Client";
 import { inject, defineComponent, ref } from "vue";
-import ModalStoreOs from "./utils/ModalStoreOs.vue";
+import ModalStoreOs from "./utils/os_history/CardStoreOs.vue";
 export default defineComponent({
   name: "Modal",
   components: { ModalStoreOs },
@@ -221,6 +221,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.q-card {
+  background-color: rgb(207, 207, 207);
+}
 .forms {
   padding: 0.1em 2em;
   .q-input {

@@ -1,6 +1,6 @@
 <template>
   <q-card-section class="row modalContent">
-    <q-form @submit="onSave" @reset="onReset" style="height: 75vh; width: 60vw">
+    <q-form @submit="onSave" style="height: 75vh; width: 60vw">
       <div class="forms row">
         <div class="col" style="display: flex; margin-top: 1em; float: top">
           <q-field style="width: 60%" standout label="Nome Cliente" stack-label>

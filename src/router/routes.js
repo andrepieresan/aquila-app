@@ -1,29 +1,11 @@
-import { defineAsyncComponent } from "vue";
-
-const MainLayout = defineAsyncComponent(() => import("layouts/MainLayout.vue"));
-const StoreUserPage = defineAsyncComponent(() =>
-  import("pages/StoreUserPage.vue")
-);
-
-const StoreOsPage = defineAsyncComponent(() => import("pages/StoreOsPage.vue"));
-
-const UpdateUserPage = defineAsyncComponent(() =>
-  import("pages/UpdateUserPage.vue")
-);
-
-const ServiceHistoryPage = defineAsyncComponent(() =>
-  import("pages/ServiceHistoryPage.vue")
-);
-
-const ReportPage = defineAsyncComponent(() => import("pages/ReportPage.vue"));
-
-const OsEdit = defineAsyncComponent(() =>
-  import("components/utils/CardEditOs.vue")
-);
-
-const OsCard = defineAsyncComponent(() =>
-  import("components/utils/CardOs.vue")
-);
+const MainLayout = () => import("layouts/MainLayout.vue");
+const StoreUserPage = () => import("pages/StoreUserPage.vue");
+const StoreOsPage = () => import("pages/StoreOsPage.vue");
+const UpdateUserPage = () => import("pages/UpdateUserPage.vue");
+const ServiceHistoryPage = () => import("pages/ServiceHistoryPage.vue");
+const ReportPage = () => import("pages/ReportPage.vue");
+const OsEdit = () => import("components/utils/os_history/CardEditOs.vue");
+const OsCard = () => import("components/utils/os_history/CardOs.vue");
 
 const routes = [
   {

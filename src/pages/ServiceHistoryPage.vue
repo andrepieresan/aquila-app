@@ -114,6 +114,7 @@ export default {
     };
   },
   async mounted() {
+    console.log("adonis");
     this.rows = await this.getRows();
   },
   watch: {

@@ -17,15 +17,6 @@ import routes from "./routes";
  */
 
 export default route(function (/* { store, ssrContext } */) {
-  const isAuthentic = async () => {
-    let { token } = LocalStorage.getItem("x-api");
-    console.log("alou", { token });
-    // jwt.verify(token, process.env.API_KEY);
-    // console.log("?:", { exist });
-    // if (!exist) return false;
-    return true;
-  };
-
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
@@ -47,10 +38,11 @@ export default route(function (/* { store, ssrContext } */) {
             next("/login");
           }
           next();
+          return;
         }
       } catch (e) {
-        console.log("aa", e.message);
         next("/login");
+        return;
       }
     }
     next();

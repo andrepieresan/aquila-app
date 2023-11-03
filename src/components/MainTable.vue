@@ -1,47 +1,49 @@
 <template>
-  <q-table
-    class="my-sticky-header-last-column-table"
-    flat
-    bordered
-    :title="headerTitle"
-    :rows="rows"
-    :columns="columns"
-    :pagination="pagination"
-  >
-    <template v-slot:header-cell="props">
-      <q-th :props="props">{{ props.col.label }} </q-th>
-    </template>
-    <template v-slot:loading="props">
-      <q-inner-loading>
-        <q-spinner-gears size="50px" color="primary" />
-      </q-inner-loading>
-    </template>
-    <template v-slot:no-data="props"> </template>
-    <template v-slot:body-cell="props">
-      <q-td :props="props">{{ props.value }} </q-td>
-      <q-menu v-if="popup" touch-position>
-        <q-list>
-          <!-- <q-item clickable>
+  <div>
+    <q-table
+      class="my-sticky-header-last-column-table"
+      flat
+      bordered
+      :title="headerTitle"
+      :rows="rows"
+      :columns="columns"
+      :pagination="pagination"
+    >
+      <template v-slot:header-cell="props">
+        <q-th :props="props">{{ props.col.label }} </q-th>
+      </template>
+      <template v-slot:loading="props">
+        <q-inner-loading>
+          <q-spinner-gears size="50px" color="primary" />
+        </q-inner-loading>
+      </template>
+      <template v-slot:no-data="props"> </template>
+      <template v-slot:body-cell="props">
+        <q-td :props="props">{{ props.value }} </q-td>
+        <q-menu v-if="popup" touch-position>
+          <q-list>
+            <!-- <q-item clickable>
               <q-item-section>test#dados:{{ props.row }}</q-item-section>
             </q-item> -->
-          <q-item v-close-popup clickable>
-            <q-item-section @click="visualizer(props.row.os_number)"
-              >Visualizar</q-item-section
-            >
-          </q-item>
-          <q-item v-close-popup clickable>
-            <q-item-section @click="edit(props.row.os_number)"
-              >Editar</q-item-section
-            >
-          </q-item>
-          <q-item v-close-popup clickable>
-            <q-item-section>Finalizar</q-item-section>
-          </q-item>
-        </q-list>
-      </q-menu>
-    </template>
-  </q-table>
-  <Modal v-model="modal" type="edit" title="Editar ordem de serviço" />
+            <q-item v-close-popup clickable>
+              <q-item-section @click="visualizer(props.row.os_number)"
+                >Visualizar</q-item-section
+              >
+            </q-item>
+            <q-item v-close-popup clickable>
+              <q-item-section @click="edit(props.row.os_number)"
+                >Editar</q-item-section
+              >
+            </q-item>
+            <q-item v-close-popup clickable>
+              <q-item-section>Finalizar</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </template>
+    </q-table>
+    <Modal v-model="modal" type="edit" title="Editar ordem de serviço" />
+  </div>
 </template>
 
 <script>

@@ -81,7 +81,7 @@
               <q-item-section>Relatórios</q-item-section>
             </q-item>
 
-            <q-item
+            <!-- <q-item
               to="/user"
               clickable
               v-ripple
@@ -93,7 +93,7 @@
               </q-item-section>
 
               <q-item-section>Perfil</q-item-section>
-            </q-item>
+            </q-item> -->
           </q-list>
         </q-scroll-area>
 
