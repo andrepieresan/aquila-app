@@ -10,6 +10,38 @@
       <template v-slot:append>
         <q-icon name="search" />
       </template>
+      <template v-slot:after>
+        <q-btn icon="event" round color="grey">
+          <q-popup-proxy
+            :offset="[-20, -20]"
+            transition-show="scale"
+            transition-hide="scale"
+          >
+            <q-date
+              :locale="{
+                months,
+                monthsShort,
+              }"
+              v-model="date"
+              default-view="Months"
+              mask="DD/MM/YYYY"
+              range
+              minimal
+            >
+              <div class="row items-center justify-end q-gutter-sm">
+                <q-btn label="Cancel" color="primary" flat v-close-popup />
+                <q-btn
+                  label="OK"
+                  color="primary"
+                  flat
+                  @click="save"
+                  v-close-popup
+                />
+              </div>
+            </q-date>
+          </q-popup-proxy>
+        </q-btn>
+      </template>
     </q-input>
 
     <MainTable
@@ -29,12 +61,28 @@ import MainTable from "src/components/MainTable.vue";
 import { useAuthStore } from "src/stores/Auth";
 import { date } from "quasar";
 import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
+import CustomParseFormat from "dayjs/plugin/customParseFormat";
 
 export default {
   components: { MainTable },
 
   methods: {
+    async getRows() {
+      let { from, to } = this.date;
+      dayjs.extend(CustomParseFormat);
+      from = dayjs(from, "DD-MM-YYYY").format("YYYY-MM-DD");
+      to = dayjs(to, "DD-MM-YYYY").format("YYYY-MM-DD");
+      let rows = await api
+        .get(`/services/${from}/${to}`, {
+          headers: {
+            Authorization: useAuthStore().token,
+            xid: useAuthStore().user_id,
+          },
+        })
+        .then((res) => res.data)
+        .catch((e) => console.log(e.message));
+      return rows;
+    },
     async filterRows(text) {
       this.rows = (this.rows || []).filter((os) => {
         if (
@@ -75,46 +123,82 @@ export default {
           field: "branch_name",
           align: "center",
         },
-        { name: "status", label: "Status", field: "status", align: "center" },
+        {
+          name: "status",
+          label: "Status",
+          field: "status",
+          align: "center",
+        },
         {
           name: "created_at",
           label: "Entrada",
           field: "created_at",
           align: "center",
+          sortOrder: "ad",
+          sortable: true,
+          sort: (a, b, rowA, rowB) => {
+            if (dayjs(a).unix() < dayjs(b).unix()) {
+              return 1;
+            } else {
+              return -1;
+            }
+          },
+          format: (value, row) => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
         },
       ];
+    },
+    async save() {
+      this.rows = await this.getRows();
     },
   },
   setup() {
     const search = ref("");
     const rows = ref([]);
     const bus = inject("bus");
-
-    const getRows = async () => {
-      let rows = await api
-        .get("/services", {
-          headers: {
-            Authorization: useAuthStore().token,
-            xid: useAuthStore().user_id,
-          },
-        })
-        .then((res) => res.data)
-        .catch((e) => {});
-      return rows;
-    };
+    const date = ref({
+      from: dayjs().subtract(1, "month").format("DD/MM/YYYY"),
+      to: dayjs().format("DD/MM/YYYY"),
+    });
 
     bus.on("resetTableOs", async () => {
-      rows.value = await getRows();
+      rows.value = await this.getRows();
     });
 
     return {
+      monthsShort: [
+        "JAN",
+        "FEV",
+        "MAR",
+        "ABR",
+        "MAIO",
+        "JUN",
+        "JUL",
+        "AGO",
+        "SET",
+        "OUT",
+        "NOV",
+        "DEZ",
+      ],
+      months: [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+      ],
+      date,
       search,
-      getRows,
       rows,
     };
   },
   async mounted() {
-    console.log("adonis");
     this.rows = await this.getRows();
   },
   watch: {

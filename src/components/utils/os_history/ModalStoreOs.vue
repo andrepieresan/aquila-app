@@ -199,6 +199,7 @@ export default defineComponent({
     const onSave = async () => {
       try {
         let branch_id = "";
+        let { branch_name, product_serial, status, defect_obs } = form.value;
         if (useClientStore().client.client_id === "") {
           let clientData = {
             name: client.value.name,
@@ -220,14 +221,13 @@ export default defineComponent({
             });
         }
 
-        if (form.value.branch_name) {
-          console.log("xx");
+        if (branch_name) {
           branch_id = await api
-            .get(`/branch/${form.value.branch_name}`)
+            .post(`/branch`, branch_name)
             .then((res) => res?.data)
             .catch((e) => console.log(e.message));
         }
-
+        return;
         let osData = {
           client_id: useClientStore().client.client_id,
           branch_id: branch_id.id,

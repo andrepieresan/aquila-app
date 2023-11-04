@@ -6,7 +6,7 @@
         <div class="row sectionLeft">
           <q-input
             class="col-6"
-            label="Nome do cliente"
+            label="Primeiro nome"
             v-model="client.name"
             standout
           />
@@ -230,6 +230,9 @@ export default defineComponent({
     async onSave() {
       try {
         let branch_id = "";
+        let client_id = "";
+        let { branch_name, product_serial, status, defect_obs } = this.form;
+
         if (useClientStore().client.client_id === "") {
           let clientData = {
             name: this.client.name,
@@ -245,29 +248,35 @@ export default defineComponent({
               },
             })
             .then((res) => {
-              let client_id = res?.data?.id;
+              client_id = res?.data?.id;
               useClientStore().setClientId(client_id);
-              return;
+              console.log(client_id);
+            })
+            .catch((e) => {
+              alert(`sem sucess`);
             });
         }
 
-        if (this.form.branch_name) {
+        if (branch_name) {
+          console.log(branch_name);
+          // return;
           branch_id = await api
-            .get(`/branch/${this.form.branch_name}`)
+            .post(`/branch`, { branch_name })
             .then((res) => res?.data)
             .catch((e) => console.log(e.message));
         }
 
         let osData = {
-          client_id: useClientStore().client.client_id,
-          branch_id: branch_id.id,
+          client_id: useClientStore().client.client_id | client_id,
+          branch_id,
           created_by: useAuthStore().user_id,
           product: `${this.brand} ${this.model}`,
-          product_serial: this.form.product_serial,
-          status: this.form.status,
-          defect_obs: this.form.defect_obs,
+          product_serial,
+          status,
+          defect_obs,
         };
         console.log({ osData });
+        // return;////
         await api.post("/services/store", osData, {
           headers: {
             Authorization: useAuthStore().token,
@@ -355,7 +364,6 @@ export default defineComponent({
         );
     },
   },
-
   beforeUnmount() {
     this.clearForms();
   },

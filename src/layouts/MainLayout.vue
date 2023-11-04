@@ -15,11 +15,11 @@
             dense
             icon="menu"
           />
-          <q-toolbar-title class="text-center">{{
-            headerTitle
-          }}</q-toolbar-title>
-          <q-btn flat @click="modal = true" round dense icon="add_circle">
-          </q-btn>
+          <q-toolbar-title class="text-center"
+            >{{ headerTitle }}
+          </q-toolbar-title>
+
+          <q-btn flat @click="modal = true" round dense icon="add_circle" />
         </q-toolbar>
       </q-header>
 
