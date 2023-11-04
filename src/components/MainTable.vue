@@ -42,7 +42,6 @@
         </q-menu>
       </template>
     </q-table>
-    <Modal v-model="modal" type="edit" title="Editar ordem de serviço" />
   </div>
 </template>
 
@@ -53,7 +52,6 @@ import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "MainTable",
-  components: { Modal },
   props: {
     sortBy: {
       type: String,

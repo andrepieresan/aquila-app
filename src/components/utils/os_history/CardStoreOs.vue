@@ -42,7 +42,7 @@
           <q-input
             class="col-6"
             label="Endereço"
-            v-model="client.mailfa"
+            v-model="client.mail"
             standout
           />
           <q-input
@@ -71,6 +71,7 @@
       <q-separator style />
       <q-card-actions style="padding: 1em" align="right">
         <q-btn
+          v-if="btnClient"
           flat
           label="Editar Cliente"
           color="primary"
@@ -104,6 +105,9 @@ export default defineComponent({
   },
   data() {
     return {
+      btnClient: ref(false),
+      authStore: useAuthStore(),
+      bus: inject("bus"),
       options: [
         "Aguardando autorização do orçamento",
         "Aguardando cliente buscar",
@@ -152,6 +156,7 @@ export default defineComponent({
       };
       this.brand = "";
       this.model = "";
+      useClientStore().clear();
     },
     async getClientData(name, phone) {
       try {
@@ -199,6 +204,7 @@ export default defineComponent({
         if (infoClient) {
           this.client.document = infoClient.document;
           this.client.mail = infoClient.mail;
+          this.client.id = infoClient.client_id;
           // this.form.branch_name = infoClient.branch_name;
           this.client.name = infoClient.client_name;
           this.client.phone = infoClient.phone;
@@ -211,7 +217,7 @@ export default defineComponent({
             document: infoClient.document,
             mail: infoClient.mail,
           });
-
+          this.btnClient = true;
           return this.$q.notify({
             type: "positive",
             position: "top",
@@ -226,10 +232,10 @@ export default defineComponent({
         let branch_id = "";
         if (useClientStore().client.client_id === "") {
           let clientData = {
-            name: client.value.name,
-            phone: client.value.phone,
-            document: client.value.document,
-            mail: client.value.mail,
+            name: this.client.name,
+            phone: this.client.phone,
+            document: this.client.document,
+            mail: this.client.mail,
           };
           await api
             .post("/client", clientData, {
@@ -246,7 +252,6 @@ export default defineComponent({
         }
 
         if (this.form.branch_name) {
-          console.log("xx");
           branch_id = await api
             .get(`/branch/${this.form.branch_name}`)
             .then((res) => res?.data)
@@ -275,9 +280,9 @@ export default defineComponent({
           message: "Ordem de serviço criada",
           timeout: 1500,
         });
-        this.$bus.emit("close");
-        bus.emit("resetTableOs");
-        clearForms();
+        this.bus.emit("close-modal");
+        this.bus.emit("resetTableOs");
+        this.clearForms();
       } catch (e) {
         this.$q.notify({
           type: "negative",
@@ -288,23 +293,71 @@ export default defineComponent({
       }
     },
     async editClient(client) {
+      console.log(client);
+      if (
+        new RegExp(`^${client.name}$`, `gi`).test(
+          useClientStore().client.name
+        ) &
+        new RegExp(`^${client.mail}$`, `gi`).test(
+          useClientStore().client.mail
+        ) &
+        new RegExp(`^${client.document}$`, `gi`).test(
+          useClientStore().client.document
+        ) &
+        new RegExp(`^${client.phone}$`, `gi`).test(
+          useClientStore().client.phone
+        )
+      ) {
+        this.$q.notify({
+          type: "negative",
+          position: "top",
+          message: "Nenhum campo alterado",
+          timeout: 1500,
+        });
+        return;
+      }
       const data = {
+        name: client.name,
+        phone: client.phone,
         mail: client.mail,
         document: client.document,
       };
 
       return await api
-        .put(`/client/${client.phone}/${client.name}`, data)
-        .then((res) =>
-          $q.notify({
+        .put(
+          `/client/${useClientStore().client.phone}/${
+            useClientStore().client.name
+          }`,
+          data
+        )
+        .then((res) => {
+          useClientStore().setClient({
+            client_id: client.id,
+            name: client.name,
+            phone: client.phone,
+            document: client.document,
+            mail: client.mail,
+          });
+          this.$q.notify({
             type: "positive",
             position: "top",
             message: "Cliente editado ;D",
             timeout: 1500,
+          });
+        })
+        .catch((e) =>
+          this.$q.notify({
+            type: "negative",
+            position: "top",
+            message: "Tivemos algum problema",
+            timeout: 1500,
           })
-        )
-        .catch((e) => console.log(e.message));
+        );
     },
+  },
+
+  beforeUnmount() {
+    this.clearForms();
   },
 });
 </script>

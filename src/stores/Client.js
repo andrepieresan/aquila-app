@@ -22,6 +22,10 @@ export const useClientStore = defineStore("client", {
     clear() {
       this.client.client_id = "";
       this.client.branch_id = "";
+      this.client.name = "";
+      this.client.document = "";
+      this.client.phone = "";
+      this.client.mail = "";
     },
     setClientId(client_id) {
       this.client.client_id = client_id;

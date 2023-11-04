@@ -23,7 +23,12 @@
         </q-toolbar>
       </q-header>
 
-      <Modal v-model="modal" type="store" title="Criar ordem de serviço" />
+      <Modal
+        v-model="modal"
+        @close="modal = false"
+        type="store"
+        title="Criar ordem de serviço"
+      />
       <q-drawer
         v-model="drawer"
         show-if-above
@@ -121,14 +126,15 @@
 import Modal from "src/components/Modal.vue";
 import { ref, inject } from "vue";
 export default {
-  setup() {
-    const modal = ref(false);
+  components: { Modal },
+  data() {
     const bus = inject("bus");
-    bus.on("close", () => {
-      modal.value = false;
+    const modal = ref(false);
+    console.log("aqui");
+    bus.on("close-modal", () => {
+      modal.value = ref(true);
     });
     return {
-      bus,
       modal,
       drawer: ref(""),
       userName: "ADONIS",
@@ -136,6 +142,5 @@ export default {
       headerTitle: ref("Lista de serviços"),
     };
   },
-  components: { Modal },
 };
 </script>
