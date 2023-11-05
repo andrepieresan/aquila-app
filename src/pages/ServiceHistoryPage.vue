@@ -34,7 +34,7 @@
                   label="OK"
                   color="primary"
                   flat
-                  @click="save"
+                  @click="save(date)"
                   v-close-popup
                 />
               </div>
@@ -59,7 +59,7 @@ import { ref, inject } from "vue";
 import { api } from "src/boot/axios";
 import MainTable from "src/components/MainTable.vue";
 import { useAuthStore } from "src/stores/Auth";
-import { date } from "quasar";
+import { useOsHistoryStore } from "src/stores/OsHistory";
 import dayjs from "dayjs";
 import CustomParseFormat from "dayjs/plugin/customParseFormat";
 
@@ -67,22 +67,6 @@ export default {
   components: { MainTable },
 
   methods: {
-    async getRows() {
-      let { from, to } = this.date;
-      dayjs.extend(CustomParseFormat);
-      from = dayjs(from, "DD-MM-YYYY").format("YYYY-MM-DD");
-      to = dayjs(to, "DD-MM-YYYY").format("YYYY-MM-DD");
-      let rows = await api
-        .get(`/services/${from}/${to}`, {
-          headers: {
-            Authorization: useAuthStore().token,
-            xid: useAuthStore().user_id,
-          },
-        })
-        .then((res) => res.data)
-        .catch((e) => console.log(e.message));
-      return rows;
-    },
     async filterRows(text) {
       this.rows = (this.rows || []).filter((os) => {
         if (
@@ -130,24 +114,32 @@ export default {
           align: "center",
         },
         {
+          name: "send_at",
+          label: "Enviado",
+          field: "send_at",
+          align: "center",
+          sortOrder: "ad",
+          sortable: true,
+
+          format: (value) =>
+            value
+              ? dayjs(value).format("DD/MM/YYYY HH:mm:ss")
+              : "Não informado",
+        },
+        {
           name: "created_at",
           label: "Entrada",
           field: "created_at",
           align: "center",
           sortOrder: "ad",
           sortable: true,
-          sort: (a, b, rowA, rowB) => {
-            if (dayjs(a).unix() < dayjs(b).unix()) {
-              return 1;
-            } else {
-              return -1;
-            }
-          },
-          format: (value, row) => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
+          format: (value) => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
         },
       ];
     },
-    async save() {
+    async save(date) {
+      let { from, to } = date;
+      useOsHistoryStore().setDate(from, to);
       this.rows = await this.getRows();
     },
   },
@@ -155,13 +147,38 @@ export default {
     const search = ref("");
     const rows = ref([]);
     const bus = inject("bus");
+    let from = dayjs().subtract(1, "month").format("DD/MM/YYYY HH:mm:ss");
+    let to = dayjs().add(1, "day").format("DD/MM/YYYY HH:mm:ss");
     const date = ref({
-      from: dayjs().subtract(1, "month").format("DD/MM/YYYY"),
-      to: dayjs().format("DD/MM/YYYY"),
+      from,
+      to,
     });
 
+    useOsHistoryStore().setDate(from, to);
+
+    const getRows = async () => {
+      let { from, to } = useOsHistoryStore();
+      dayjs.extend(CustomParseFormat);
+      from = dayjs(from, "DD-MM-YYYY").format("YYYY-MM-DD");
+      to = dayjs(to, "DD-MM-YYYY").format("YYYY-MM-DD");
+      let rows = await api
+        .post(
+          `/services`,
+          { from, to },
+          {
+            headers: {
+              Authorization: useAuthStore().token,
+              xid: useAuthStore().user_id,
+            },
+          }
+        )
+        .then((res) => res.data)
+        .catch((e) => console.log(e.message));
+      return rows;
+    };
+
     bus.on("resetTableOs", async () => {
-      rows.value = await this.getRows();
+      rows.value = await getRows();
     });
 
     return {
@@ -193,6 +210,7 @@ export default {
         "Novembro",
         "Dezembro",
       ],
+      getRows,
       date,
       search,
       rows,
@@ -209,6 +227,10 @@ export default {
 };
 </script>
 <style lang="scss">
+.main-table-content {
+  min-width: 40vw;
+  margin: 1em 7em;
+}
 .search {
   justify-self: center;
   width: 60vw;

@@ -1,24 +1,18 @@
 <template>
-  <!--STORE OS MODAL-->
-  <q-card-section class="scroll modalContent">
-    <q-form @submit="onSave" style="height: 75vh; width: 60vw">
-      <div class="forms">
-        <div class="row sectionLeft">
+  <div class="main">
+    <q-card-section>
+      <q-form class="row forms" @submit="onSave">
+        <div class="col-6" v-for="item in items()">
           <q-input
-            class="col-6"
-            label="Primeiro nome"
-            v-model="client.name"
-            standout
-          />
-          <q-input
-            class="col-6"
-            label="Telefone"
-            v-model="client.phone"
-            standout
+            label-color="black-7"
+            v-if="item.isClient"
+            :label="item.label"
+            v-model="client[item.value]"
+            outlined
           >
-            <template v-slot:after>
+            <template v-if="/phone/gi.test(item.value)" v-slot:after>
               <q-btn
-                id="save-btn"
+                id="search_btn"
                 icon="saved_search"
                 @click="searchClient()"
                 color="primary"
@@ -26,65 +20,51 @@
             </template>
           </q-input>
           <q-input
-            class="col-6"
-            label="Filial"
-            v-model="form.branch_name"
-            standout
-          />
-          <q-input class="col-6" label="Modelo" v-model="model" standout />
-          <q-input
-            class="col-6"
-            label="Documento"
-            v-model="client.document"
-            standout
-          />
-          <q-input class="col-6" label="Marca" v-model="brand" standout />
-          <q-input
-            class="col-6"
-            label="Endereço"
-            v-model="client.mail"
-            standout
-          />
-          <q-input
-            class="col-6"
-            label="Serial"
-            v-model="form.product_serial"
-            standout
+            label-color="black-7"
+            v-else-if="item.isOs"
+            :label="item.label"
+            v-model="form[item.value]"
+            outlined
           />
         </div>
-        <div style="float: bottom; width: 100%">
+        <div class="bottom">
           <q-select
-            standout
+            label-color="black-7"
+            outlined
             v-model="form.status"
             :options="options"
             label="Situação da Ordem de Serviço"
           />
           <q-input
-            style="margin: 1em"
-            standout
+            label-color="black-7"
+            outlined
             v-model="form.defect_obs"
             type="textarea"
             label="Defeito"
           />
+          <q-card-actions align="right">
+            <q-btn
+              text-color="blue-7"
+              v-if="btnClient"
+              flat
+              label="Editar Cliente"
+              @click="editClient(client)"
+            />
+            <q-btn
+              text-color="blue-7"
+              flat
+              label="Cancelar"
+              color="primary"
+              v-close-popup
+            />
+            <q-btn text-color="blue-7" flat type="submit" label="Salvar" />
+          </q-card-actions>
         </div>
-      </div>
-      <q-separator style />
-      <q-card-actions style="padding: 1em" align="right">
-        <q-btn
-          v-if="btnClient"
-          flat
-          label="Editar Cliente"
-          color="primary"
-          @click="editClient(client)"
-        />
-        <q-btn flat label="Cancelar" color="primary" v-close-popup />
-        <q-btn flat type="submit" label="Salvar" color="primary" />
-      </q-card-actions>
-    </q-form>
-  </q-card-section>
+      </q-form>
+    </q-card-section>
+  </div>
 </template>
 <script>
-import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 import { useAuthStore } from "src/stores/Auth";
 import { useClientStore } from "src/stores/Client";
@@ -92,17 +72,6 @@ import { inject, defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "ModalStoreOs",
-  props: {
-    type: {
-      type: String,
-    },
-    row: {
-      type: Object,
-    },
-    title: {
-      type: String,
-    },
-  },
   data() {
     return {
       btnClient: ref(false),
@@ -126,6 +95,8 @@ export default defineComponent({
         mail: "",
       }),
       form: {
+        model: ref(""),
+        brand: ref(""),
         client_id: ref(""),
         branch_id: ref(""),
         branch_name: ref(""),
@@ -138,6 +109,50 @@ export default defineComponent({
     };
   },
   methods: {
+    items() {
+      return [
+        {
+          isClient: true,
+          value: "name",
+          label: "Primeiro nome",
+        },
+        {
+          isClient: true,
+          value: "phone",
+          label: "Telefone",
+        },
+        {
+          isClient: true,
+          value: "document",
+          label: "Documento",
+        },
+        {
+          isOs: true,
+          value: "model",
+          label: "Modelo",
+        },
+        {
+          isClient: true,
+          value: "mail",
+          label: "Endereço",
+        },
+        {
+          isOs: true,
+          value: "brand",
+          label: "Marca",
+        },
+        {
+          isOs: true,
+          value: "branch_name",
+          label: "Filial",
+        },
+        {
+          isOs: true,
+          value: "product_serial",
+          label: "Serial",
+        },
+      ];
+    },
     clearForms() {
       this.client = {
         id: "",
@@ -163,9 +178,11 @@ export default defineComponent({
         if (!name && !phone) {
           return false;
         }
+
+        let data = { name, phone };
         // name = name.replace("", "-");
         return await api
-          .get(`/client/${phone}/${name}`, {
+          .post(`/client/show`, data, {
             headers: {
               Authorization: useAuthStore().token,
               xid: useAuthStore().user_id,
@@ -184,9 +201,11 @@ export default defineComponent({
     async searchClient() {
       try {
         let { name, phone } = this.client;
-
-        console.log(name, phone);
         useClientStore().clear();
+
+        name = name.trimEnd();
+        name = name.trimStart();
+        phone = phone.trim();
 
         if (!name && !phone) {
           this.$q.notify({
@@ -200,7 +219,6 @@ export default defineComponent({
 
         let infoClient = await this.getClientData(name, phone);
 
-        console.log(infoClient);
         if (infoClient) {
           this.client.document = infoClient.document;
           this.client.mail = infoClient.mail;
@@ -248,9 +266,8 @@ export default defineComponent({
               },
             })
             .then((res) => {
-              client_id = res?.data?.id;
+              client_id = res?.data;
               useClientStore().setClientId(client_id);
-              console.log(client_id);
             })
             .catch((e) => {
               alert(`sem sucess`);
@@ -258,8 +275,6 @@ export default defineComponent({
         }
 
         if (branch_name) {
-          console.log(branch_name);
-          // return;
           branch_id = await api
             .post(`/branch`, { branch_name })
             .then((res) => res?.data)
@@ -270,13 +285,12 @@ export default defineComponent({
           client_id: useClientStore().client.client_id | client_id,
           branch_id,
           created_by: useAuthStore().user_id,
-          product: `${this.brand} ${this.model}`,
+          product: `${this.form.brand} ${this.form.model}`,
           product_serial,
           status,
           defect_obs,
         };
-        console.log({ osData });
-        // return;////
+
         await api.post("/services/store", osData, {
           headers: {
             Authorization: useAuthStore().token,
@@ -302,7 +316,6 @@ export default defineComponent({
       }
     },
     async editClient(client) {
-      console.log(client);
       if (
         new RegExp(`^${client.name}$`, `gi`).test(
           useClientStore().client.name
@@ -333,12 +346,7 @@ export default defineComponent({
       };
 
       return await api
-        .put(
-          `/client/${useClientStore().client.phone}/${
-            useClientStore().client.name
-          }`,
-          data
-        )
+        .post(`/client/update`, data)
         .then((res) => {
           useClientStore().setClient({
             client_id: client.id,
@@ -371,19 +379,29 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.forms {
-  padding: 0.1em 2em;
-  .q-input {
-    padding: 0.7em 1em;
-  }
-  .q-select {
-    padding: 0.7em 1em;
-  }
-  #save-btn {
-    margin: 1.4em 0.3em;
-    // margin-left: 40px;
-    width: 20px;
-    height: 20px;
+.main {
+  width: 50vw;
+  .forms {
+    margin: 2em 0;
+    min-width: 40vw;
+    min-height: 35vh;
+    padding: 2em 2em;
+    .q-field {
+      padding: 0.7em 1em;
+    }
+    .q-select {
+      padding: 0.7em 1em;
+    }
+    #search_btn {
+      margin: 1.4em 0.3em;
+      // margin-left: 40px;
+      width: 20px;
+      height: 20px;
+    }
+    .bottom {
+      float: bottom;
+      width: 100%;
+    }
   }
 }
 </style>

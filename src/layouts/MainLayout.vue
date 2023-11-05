@@ -130,13 +130,20 @@ export default {
   data() {
     const bus = inject("bus");
     const modal = ref(false);
-    console.log("aqui");
+    const drawer = ref("");
     bus.on("close-modal", () => {
       modal.value = ref(true);
     });
+    bus.on("close-drawer", () => {
+      drawer.value = "inbox";
+    });
+    bus.on("open-drawer", () => {
+      drawer.value = "";
+      console.log("asawa");
+    });
     return {
       modal,
-      drawer: ref(""),
+      drawer,
       userName: "ADONIS",
       userRole: "technical assistance \nmanager",
       headerTitle: ref("Lista de serviços"),

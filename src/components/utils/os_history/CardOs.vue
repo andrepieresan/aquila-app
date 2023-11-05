@@ -1,67 +1,64 @@
 <template>
-  <q-card-section class="row modalContent">
-    <q-form @submit="onSave" style="height: 75vh; width: 60vw">
-      <div class="forms row">
-        <div class="col" style="display: flex; margin-top: 1em; float: top">
-          <q-field style="width: 60%" standout label="Nome Cliente" stack-label>
-            {{ client.name }}
-          </q-field>
-          <q-field style="width: 40%" standout label="Telefone" stack-label>
-            {{ client.phone }}
-          </q-field>
-        </div>
-        <div class="col" style="width: 100%">
-          <q-field standout label="Filial" stack-label>
-            {{ form.branch_name }}
-          </q-field>
-        </div>
-        <div class="col" style="display: flex">
-          <q-field style="width: 50%" standout label="Produto" stack-label>
-            {{ form.product }}
-          </q-field>
-          <q-field style="width: 50%" standout label="Serial" stack-label>
-            {{ form.product_serial }}
-          </q-field>
-        </div>
-        <div class="col">
-          <q-select
-            standout
-            v-model="form.status"
-            :options="options"
-            label="Situação da Ordem de Serviço"
-          />
-          <q-input
-            standout
-            v-model="form.defect_obs"
-            type="textarea"
-            label="Defeito"
-          />
-        </div>
-      </div>
-      <q-separator />
-      <div class="btn-bottom">
-        <q-card-actions align="right">
-          <q-btn
-            flat
-            to="/os-history"
-            label="Cancelar"
-            color="primary"
-            v-close-popup
-          />
-          <q-btn flat type="submit" label="Salvar" color="primary" />
-        </q-card-actions>
-      </div>
-    </q-form>
-  </q-card-section>
+  <q-form class="row forms" @submit="onSave">
+    <div v-for="item in items()" class="col-6 fields">
+      <q-field
+        color="black"
+        v-if="item.isClient"
+        outlined
+        :label="item.label"
+        stack-label
+      >
+        {{ client[item.value] }}
+      </q-field>
+      <q-field
+        color="black"
+        v-else-if="item.isOs"
+        outlined
+        :label="item.label"
+        stack-label
+      >
+        {{ form[item.value] }}
+      </q-field>
+    </div>
+    <div style="float: bottom; width: 100%">
+      <q-select
+        outlined
+        v-model="form.status"
+        :options="options"
+        label="Situação da Ordem de Serviço"
+      />
+      <q-field color="black" outlined label="Defeito" stack-label>
+        {{ form.defect_obs }}
+      </q-field>
+      <q-card-actions align="right">
+        <q-btn
+          text-color="blue-7"
+          flat
+          to="/os-history"
+          label="Cancelar"
+          v-close-popup
+        />
+        <q-btn
+          text-color="blue-7"
+          flat
+          type="submit"
+          label="Salvar"
+          color="primary"
+        />
+      </q-card-actions>
+    </div>
+  </q-form>
 </template>
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 import { useAuthStore } from "src/stores/Auth";
-
+import { api } from "src/boot/axios";
+import { useOsHistoryStore } from "src/stores/OsHistory";
 export default defineComponent({
   name: "CardEditOs",
   data() {
     return {
+      align: "center",
       options: [
         "Aguardando autorização do orçamento",
         "Aguardando cliente buscar",
@@ -95,9 +92,68 @@ export default defineComponent({
     title: String,
   },
   methods: {
+    items() {
+      return [
+        {
+          isOs: true,
+          value: "os_number",
+          label: "Número da Os",
+        },
+        {
+          isClient: true,
+          value: "name",
+          label: "Nome do cliente",
+        },
+        {
+          isClient: true,
+          value: "phone",
+          label: "Telefone",
+        },
+        {
+          isClient: true,
+          value: "mail",
+          label: "Endereço",
+        },
+        {
+          isOs: true,
+          value: "branch_name",
+          label: "Filial",
+        },
+        {
+          isOs: true,
+          value: "product",
+          label: "Produto",
+        },
+        {
+          isOs: true,
+          value: "product_serial",
+          label: "Serial",
+        },
+        {
+          isOs: true,
+          value: "service_cost",
+          label: "Custo do serviço",
+        },
+        {
+          isOs: true,
+          value: "part_cost",
+          label: "Custo da peça",
+        },
+
+        {
+          isOs: true,
+          value: "ticket_amount",
+          label: "Valor Total",
+        },
+      ];
+    },
     clearForms() {
       client.value = { id: "", name: "", phone: "", document: "", mail: "" };
       form.value = {
+        service_cost: "",
+        part_cost: "",
+        ticket_amount: "",
+        branch_name: "",
         client_id: "",
         branch_id: "",
         product: "",
@@ -140,23 +196,73 @@ export default defineComponent({
         product_serial,
         status,
         defect_obs,
+        service_cost,
+        part_cost,
+        ticket_amount,
+        mail,
       } = await this.getOsData(this.$route.params.id);
 
       this.client = {
         name: client_name,
         phone: client_phone,
+        mail,
       };
+
       this.form = {
+        os_number,
         branch_name,
         product,
         product_serial,
         status,
         defect_obs,
+        service_cost,
+        part_cost,
+        ticket_amount,
       };
+      useOsHistoryStore().setOsStatus(this.form.status);
     },
 
     async onSave() {
-      console.log("aqxui", route.params);
+      let { status } = this.form;
+
+      if (new RegExp(`^${status}$`, `gi`).test(useOsHistoryStore().status)) {
+        this.$q.notify({
+          type: "warning",
+          position: "top",
+          message: "Sem alteração",
+          timeout: 1500,
+        });
+        return;
+      }
+
+      await api
+        .post(
+          `services/${this.$route.params.id}/set-status`,
+          { status },
+          {
+            headers: {
+              Authorization: useAuthStore().token,
+              xid: useAuthStore().user_id,
+            },
+          }
+        )
+        .then((res) => {
+          useOsHistoryStore().setOsStatus(status);
+          this.$q.notify({
+            type: "positive",
+            position: "top",
+            message: "Status alterado!",
+            timeout: 1500,
+          });
+        })
+        .catch((e) => {
+          this.$q.notify({
+            type: "negative",
+            position: "top",
+            message: "Tivemos algum problema",
+            timeout: 1500,
+          });
+        });
     },
   },
   async mounted() {
@@ -166,16 +272,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.modalContent {
-  display: flex;
-  justify-content: center;
-}
-.btn-bottom {
-  margin: 4em 1em;
-}
 .forms {
-  display: block;
-  padding: 0.1em 2em;
+  margin: 5em 25em;
   .q-field {
     padding: 0.7em 1em;
   }

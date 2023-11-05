@@ -47,7 +47,6 @@
 
 <script>
 import { defineComponent, ref, inject } from "vue";
-import Modal from "./Modal.vue";
 import { useRouter } from "vue-router";
 
 export default defineComponent({
@@ -73,6 +72,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const bus = inject("bus");
     const router = useRouter();
     let modal = ref(false);
     const edit = (id) => {
@@ -80,8 +80,10 @@ export default defineComponent({
     };
     const visualizer = (id) => {
       router.push({ name: `os-card`, params: { id } });
+      bus.emit("close-drawer");
     };
     return {
+      bus,
       modal,
       edit,
       visualizer,
@@ -93,7 +95,6 @@ export default defineComponent({
       },
     };
   },
-
   methods: {},
 });
 </script>
