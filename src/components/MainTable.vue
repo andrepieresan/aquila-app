@@ -77,6 +77,7 @@ export default defineComponent({
     let modal = ref(false);
     const edit = (id) => {
       router.push({ name: `os-edit`, params: { id } });
+      bus.emit("close-drawer");
     };
     const visualizer = (id) => {
       router.push({ name: `os-card`, params: { id } });

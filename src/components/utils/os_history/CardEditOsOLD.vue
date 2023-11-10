@@ -1,39 +1,65 @@
 <template>
   <q-form class="row forms" @submit="onSave">
-    <div
-      v-for="item in items()"
-      :class="!item.report ? 'fields col-6' : 'fields col-4'"
-    >
+    <div v-for="item in items()" class="fields col-6">
       <q-field
-        v-if="!item.editable"
         color="black"
+        v-if="item.isClient && !item.editable"
+        outlined
+        :label="item.label"
+        stack-label
+      >
+        {{ client[item.value] }}
+      </q-field>
+      <q-input
+        color="black"
+        v-else-if="item.isTicket && item.editable"
+        outlined
+        :label="item.label"
+        v-model="this[item.value]"
+        stack-label
+      >
+        <template v-slot:before>
+          <q-input
+            id="test"
+            style="width: 100%"
+            color="black"
+            outlined
+            :label="item.label"
+            v-model="this[item.value]"
+            stack-label
+          />
+        </template>
+      </q-input>
+      <q-field
+        color="black"
+        v-else-if="item.isTicket"
         outlined
         :label="item.label"
         stack-label
       >
         {{ this[item.value] }}
       </q-field>
-      <q-input
-        v-else-if="item.editable"
+      <q-field
         color="black"
+        v-else-if="item.isOs && !item.editable"
         outlined
         :label="item.label"
-        v-model="this[item.value]"
         stack-label
       >
-      </q-input>
+        {{ form[item.value] }}
+      </q-field>
     </div>
     <div style="float: bottom; width: 100%">
       <q-select
         outlined
-        v-model="status"
+        v-model="form.status"
         :options="options"
         label="Situação da Ordem de Serviço"
       />
       <q-input
         color="black"
         outlined
-        v-model="defect_obs"
+        v-model="form.defect_obs"
         label="Defeito"
         stack-label
       />
@@ -82,22 +108,27 @@ export default defineComponent({
   },
 
   data() {
-    return {
-      os_number: "",
-      client_id: "",
-      branch_id: "",
+    let client = ref({
+      id: 0,
+      name: "",
+      phone: "",
+      document: "",
+      mail: "",
+    });
+
+    let form = ref({
+      os_number: 0,
+      client_id: 0,
+      branch_id: 0,
       product: "",
       defect_obs: "",
       status: "",
       product_serial: "",
-      branch_name: "",
-      client_name: "",
-      client_phone: "",
-      client_document: "",
-      client_mail: "",
-      model: "",
-      brand: "",
       created_by_user_id: useAuthStore().user_id,
+    });
+
+    return {
+      align: "center",
       options: [
         "Aguardando autorização do orçamento",
         "Aguardando cliente buscar",
@@ -105,6 +136,10 @@ export default defineComponent({
         "Em manutenção",
         "Aguardando manutenção",
       ],
+      model: "",
+      brand: "",
+      form,
+      client,
       part_cost: ref(0),
       service_cost: ref(0),
       ticket_amount: ref(0),
@@ -129,17 +164,17 @@ export default defineComponent({
         },
         {
           isClient: true,
-          value: "client_name",
+          value: "name",
           label: "Nome do cliente",
         },
         {
           isClient: true,
-          value: "client_phone",
+          value: "phone",
           label: "Telefone",
         },
         {
           isClient: true,
-          value: "client_mail",
+          value: "mail",
           label: "Endereço",
         },
         {
@@ -155,63 +190,46 @@ export default defineComponent({
         {
           isTicket: true,
           editable: true,
-          report: true,
-          value: "service_name",
-          label: "Serviço",
+          valueReport: "service_cost",
+          labelReport: "",
+          value: "service_cost",
+          label: "Custo do serviço  (R$)",
         },
         {
-          isTicket: true,
-          editable: true,
-          report: true,
-          value: "part_name",
-          label: "Peça",
-        },
-        {
-          isTicket: true,
-          editable: true,
-          report: true,
+          isOs: true,
           value: "product_serial",
-          label: "Serial Produto",
+          label: "Serial",
         },
         {
           isTicket: true,
           editable: true,
-          report: true,
+          value: "part_cost",
+          label: "Custo da peça  (R$)",
+        },
+        {
+          isTicket: true,
           value: "ticket_amount",
           label: "Valor total (R$)",
-        },
-        {
-          isTicket: true,
-          editable: true,
-          report: true,
-          value: "service_cost",
-          label: "Custo (R$)",
-        },
-        {
-          isTicket: true,
-          editable: true,
-          report: true,
-          value: "part_cost",
-          label: "Custo (R$)",
         },
       ];
     },
 
     clearForms() {
-      this.os_number = "";
-      this.client_id = "";
-      this.branch_id = "";
-      this.product = "";
-      this.defect_obs = "";
-      this.status = "";
-      this.product_serial = "";
-      this.branch_name = "";
-      this.client_name = "";
-      this.client_phone = "";
-      this.client_document = "";
-      this.client_mail = "";
-      this.model = "";
-      this.brand = "";
+      client.value = { id: "", name: "", phone: "", document: "", mail: "" };
+      form.value = {
+        service_cost: "",
+        part_cost: "",
+        ticket_amount: "",
+        branch_name: "",
+        client_id: "",
+        branch_id: "",
+        product: "",
+        defect_obs: "",
+        status: "",
+        product_serial: "",
+      };
+      brand.value = "";
+      model.value = "";
     },
 
     async getOsData(id) {
@@ -251,20 +269,26 @@ export default defineComponent({
         mail,
       } = await this.getOsData(this.$route.params.id);
 
-      this.client_name = client_name;
-      this.client_phone = client_phone;
-      this.client_mail = mail;
-      this.os_number = os_number;
-      this.branch_name = branch_name;
-      this.product = product;
-      this.product_serial = product_serial;
-      this.status = status;
-      this.defect_obs = defect_obs;
-      this.service_cost = service_cost;
-      this.part_cost = part_cost;
+      this.client = {
+        name: client_name,
+        phone: client_phone,
+        mail,
+      };
+
+      this.form = {
+        os_number,
+        branch_name,
+        product,
+        product_serial,
+        status,
+        defect_obs,
+        service_cost,
+        part_cost,
+      };
 
       this.part_cost = /null/gi.test(part_cost) ? 0 : part_cost;
       this.service_cost = /null/gi.test(service_cost) ? 0 : service_cost;
+
       this.ticket_amount = ticket_amount | (service_cost + part_cost);
 
       let ticket = {
@@ -275,14 +299,16 @@ export default defineComponent({
       };
 
       useOsHistoryStore().setTicketOs(ticket);
-      useOsHistoryStore().setOsStatus(status);
+      useOsHistoryStore().setOsStatus(this.form.status);
     },
 
     async onSave() {
+      let { status, defect_obs, os_number } = this.form;
+
       let ticket = {
-        os_number: this.os_number,
-        status: this.status,
-        defect_obs: this.defect_obs,
+        os_number,
+        status,
+        defect_obs,
         part_cost: this.part_cost,
         service_cost: this.service_cost,
         ticket_amount: this.ticket_amount,
@@ -309,7 +335,7 @@ export default defineComponent({
         })
         .then((res) => {
           useOsHistoryStore().setTicketOs(ticket);
-          useOsHistoryStore().setOsStatus(this.status);
+          useOsHistoryStore().setOsStatus(status);
           this.$q.notify({
             type: "positive",
             position: "top",
@@ -342,7 +368,8 @@ export default defineComponent({
   .q-select {
     padding: 0.7em 1em;
   }
-  .q-input {
+  #test {
+    padding: 11em 1em;
   }
 }
 </style>

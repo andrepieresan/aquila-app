@@ -1,12 +1,6 @@
 <template>
   <q-popup-edit :model-value="editRow" :v-model="editRow" v-slot="scope">
-    <q-input
-      outlined
-      autofocus
-      dense
-      v-model="scope.value"
-      :model-value="scope.value"
-    >
+    <q-input outlined autofocus dense v-model="scope.value">
       <template v-slot:after>
         <q-btn
           flat
