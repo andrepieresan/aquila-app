@@ -1,21 +1,17 @@
-import { defineAsyncComponent } from "vue";
-
-const MainLayout = defineAsyncComponent(() => import("layouts/MainLayout.vue"));
-const StoreUserPage = defineAsyncComponent(() =>
-  import("pages/StoreUserPage.vue")
-);
-const StoreOsPage = defineAsyncComponent(() => import("pages/StoreOsPage.vue"));
-const UpdateUserPage = defineAsyncComponent(() =>
-  import("pages/UpdateUserPage.vue")
-);
-const ServiceHistoryPage = defineAsyncComponent(() =>
-  import("pages/ServiceHistoryPage.vue")
-);
-const StockPage = defineAsyncComponent(() => import("pages/StockPage.vue"));
+const MainLayout = () => import("layouts/MainLayout.vue");
+const StoreUserPage = () => import("pages/StoreUserPage.vue");
+const StoreOsPage = () => import("pages/StoreOsPage.vue");
+const UpdateUserPage = () => import("pages/UpdateUserPage.vue");
+const ServiceHistoryPage = () => import("pages/ServiceHistoryPage.vue");
+const ReportPage = () => import("pages/ReportPage.vue");
+const OsEdit = () => import("components/utils/os_history/CardEditOs.vue");
+const OsCard = () => import("components/utils/os_history/CardOs.vue");
+const MaterialPage = () => import("pages/MaterialPage.vue");
 
 const routes = [
   {
-    path: "",
+    path: "/login",
+    name: "login",
     component: StoreUserPage,
     //component: () => import("layouts/LoginLayout.vue"),
     // children: [
@@ -32,12 +28,30 @@ const routes = [
       },
       {
         path: "os-history",
+        name: "os-history",
         component: ServiceHistoryPage,
       },
-      { path: "user", component: UpdateUserPage },
       {
-        path: "stock",
-        component: StockPage,
+        path: "os-history/:id",
+        name: "os-card",
+        component: OsCard,
+      },
+      {
+        path: "os-edit/:id",
+        name: "os-edit",
+        component: OsEdit,
+      },
+      {
+        path: "home",
+        component: UpdateUserPage,
+      },
+      {
+        path: "report",
+        component: ReportPage,
+      },
+      {
+        path: "material",
+        component: MaterialPage,
       },
     ],
   },
