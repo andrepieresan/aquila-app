@@ -126,7 +126,7 @@ export default defineComponent({
   },
   methods: {
     setTicket() {
-      return Number(this.part_cost) + Number(this.service_cost);
+      return Number(this.part_cost) + Number(this.service_cost) || 0;
     },
 
     items() {
@@ -172,7 +172,7 @@ export default defineComponent({
           select: true,
           report: true,
           options: ["CONECTOR", "TELA", "CAMERA", "ALTO FALANTE", "OUTRO"],
-          value: "part_name",
+          value: "material_name",
           label: "Peça",
         },
         {
@@ -255,8 +255,10 @@ export default defineComponent({
         status,
         defect_obs,
         service_cost,
-        part_cost,
+        material_cost,
         ticket_amount,
+        service_name,
+        material_name,
         mail,
       } = await this.getOsData(this.$route.params.id);
 
@@ -270,11 +272,13 @@ export default defineComponent({
       this.status = status;
       this.defect_obs = defect_obs;
       this.service_cost = service_cost;
-      this.part_cost = part_cost;
+      this.part_cost = material_cost;
+      this.service_name = service_name;
+      this.material_name = material_name;
 
-      this.part_cost = /null/gi.test(part_cost) ? 0 : part_cost;
+      this.part_cost = /null/gi.test(material_cost) ? 0 : material_cost;
       this.service_cost = /null/gi.test(service_cost) ? 0 : service_cost;
-      this.ticket_amount = ticket_amount | (service_cost + part_cost);
+      this.ticket_amount = ticket_amount || (service_cost + part_cost);
 
       let ticket = {
         os_number,
@@ -292,8 +296,8 @@ export default defineComponent({
         os_number: this.os_number,
         status: this.status,
         defect_obs: this.defect_obs,
-        part_name: this.part_name,
-        part_cost: this.part_cost,
+        material_name: this.part_name,
+        material_cost: this.part_cost,
         service_name: this.service_name,
         service_cost: this.service_cost,
         ticket_amount: this.ticket_amount,
@@ -311,7 +315,7 @@ export default defineComponent({
         });
         return;
       }
-
+      // console.log({ticket});
       await api
         .post(`services/edit`, ticket, {
           headers: {
