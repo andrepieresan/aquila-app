@@ -7,7 +7,8 @@
         </div>
       </q-card-section>
       <q-separator />
-      <ModalStoreOs />
+      <ModalStoreOs v-if="/store_os/gi.test(type)" />
+      <ModalStoreMaterial v-if="/material/gi.test(type)" />
     </q-card>
   </q-dialog>
 </template>
@@ -15,10 +16,14 @@
 <script>
 import { defineComponent, ref } from "vue";
 import ModalStoreOs from "./utils/os_history/CardStoreOs.vue";
+import ModalStoreMaterial from "./utils/material/CardStoreMaterial.vue";
 export default defineComponent({
   name: "Modal",
-  components: { ModalStoreOs },
+  components: { ModalStoreOs,ModalStoreMaterial },
   props: {
+    type: {
+      type: String,
+    },
     title: {
       type: String,
     },

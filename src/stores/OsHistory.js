@@ -9,7 +9,9 @@ export const useOsHistoryStore = defineStore("OsHistory", {
       status: "",
       defect_obs: "",
       part_cost: 0,
+      part_name: "",
       service_cost: 0,
+      service_name: "",
     },
   }),
 

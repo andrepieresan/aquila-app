@@ -16,18 +16,35 @@
             icon="menu"
           />
           <q-toolbar-title class="text-center"
-            >{{ headerTitle }}
+            >{{ headerTitle.name }}
           </q-toolbar-title>
 
-          <q-btn flat @click="modal = true" round dense icon="add_circle" />
+          <q-btn
+            flat
+            @click="setModal(headerTitle.key)"
+            round
+            dense
+            icon="add_circle"
+          />
         </q-toolbar>
       </q-header>
-
       <Modal
-        v-model="modal"
-        @close="modal = false"
-        type="store"
+        v-model="os_modal"
+        @close="modal"
+        type="store_os"
         title="Criar ordem de serviço"
+      />
+      <Modal
+        v-model="reports_modal"
+        @close="modal"
+        type="reports"
+        title="Criar relátorio"
+      />
+      <Modal
+        v-model="material_modal"
+        @close="modal"
+        type="material"
+        title="Cadastrar material"
       />
       <q-drawer
         v-model="drawer"
@@ -48,7 +65,7 @@
               to="/os-history"
               clickable
               v-ripple
-              @click="headerTitle = 'Lista de serviços'"
+              @click="this.setHeader({ name: 'Lista de serviços', key: 'os' })"
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -76,7 +93,7 @@
               to="/report"
               clickable
               v-ripple
-              @click="headerTitle = 'Relatórios'"
+              @click="this.setHeader({ name: 'Relatórios', key: 'reports' })"
               active-class="menu-link"
             >
               <q-item-section avatar>
@@ -86,19 +103,19 @@
               <q-item-section>Relatórios</q-item-section>
             </q-item>
 
-            <!-- <q-item
-              to="/user"
+            <q-item
+              to="/material"
               clickable
               v-ripple
-              @click="headerTitle = 'Perfil'"
+              @click="this.setHeader({ name: 'Materiais', key: 'material' })"
               active-class="menu-link"
             >
               <q-item-section avatar>
-                <q-icon name="supervisor_account" />
+                <q-icon name="build_circle" />
               </q-item-section>
 
-              <q-item-section>Perfil</q-item-section>
-            </q-item> -->
+              <q-item-section>Materiais</q-item-section>
+            </q-item>
           </q-list>
         </q-scroll-area>
 
@@ -125,14 +142,22 @@
 <script>
 import Modal from "src/components/Modal.vue";
 import { ref, inject } from "vue";
+
 export default {
   components: { Modal },
   data() {
     const bus = inject("bus");
-    const modal = ref(false);
     const drawer = ref("");
+    let material_modal = ref(false);
+    let reports_modal = ref(false);
+    let os_modal = ref(false);
+    let modal = ref(false);
+
     bus.on("close-modal", () => {
-      modal.value = ref(true);
+      console.log("test");
+      material_modal.value = ref(false);
+      reports_modal.value = ref(false);
+      os_modal.value = ref(false);
     });
     bus.on("close-drawer", () => {
       drawer.value = "inbox";
@@ -142,11 +167,33 @@ export default {
       console.log("asawa");
     });
     return {
+      material_modal,
+      reports_modal,
+      os_modal,
+      setHeader(header) {
+        this.headerTitle.name = header.name;
+        this.headerTitle.key = header.key;
+      },
+      setModal(modal) {
+        switch (modal) {
+          case "material":
+            this.material_modal = true;
+            break;
+          case "reports":
+            this.reports_modal = true;
+            break;
+          case "os":
+            this.os_modal = true;
+            break;
+          default:
+            break;
+        }
+      },
       modal,
       drawer,
       userName: "ADONIS",
       userRole: "technical assistance \nmanager",
-      headerTitle: ref("Lista de serviços"),
+      headerTitle: ref({ name: "", key: "" }),
     };
   },
 };

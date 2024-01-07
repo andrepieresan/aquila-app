@@ -4,8 +4,16 @@
       v-for="item in items()"
       :class="!item.report ? 'fields col-6' : 'fields col-4'"
     >
+      <q-select
+        v-if="item.select"
+        outlined
+        clearable
+        v-model="this[item.value]"
+        :options="item.options"
+        :label="item.label"
+      />
       <q-field
-        v-if="!item.editable"
+        v-else-if="!item.editable"
         color="black"
         outlined
         :label="item.label"
@@ -20,8 +28,7 @@
         :label="item.label"
         v-model="this[item.value]"
         stack-label
-      >
-      </q-input>
+      />
     </div>
     <div style="float: bottom; width: 100%">
       <q-select
@@ -83,6 +90,8 @@ export default defineComponent({
 
   data() {
     return {
+      part_name: "",
+      service_name: "",
       os_number: "",
       client_id: "",
       branch_id: "",
@@ -153,16 +162,16 @@ export default defineComponent({
           label: "Produto",
         },
         {
-          isTicket: true,
-          editable: true,
+          select: true,
           report: true,
+          options: ["LIMPEZA", "REPARO", "OUTRO"],
           value: "service_name",
           label: "Serviço",
         },
         {
-          isTicket: true,
-          editable: true,
+          select: true,
           report: true,
+          options: ["CONECTOR", "TELA", "CAMERA", "ALTO FALANTE", "OUTRO"],
           value: "part_name",
           label: "Peça",
         },
@@ -177,13 +186,6 @@ export default defineComponent({
           isTicket: true,
           editable: true,
           report: true,
-          value: "ticket_amount",
-          label: "Valor total (R$)",
-        },
-        {
-          isTicket: true,
-          editable: true,
-          report: true,
           value: "service_cost",
           label: "Custo (R$)",
         },
@@ -193,6 +195,13 @@ export default defineComponent({
           report: true,
           value: "part_cost",
           label: "Custo (R$)",
+        },
+        {
+          isTicket: true,
+          editable: true,
+          report: true,
+          value: "ticket_amount",
+          label: "Valor total (R$)",
         },
       ];
     },
@@ -283,11 +292,14 @@ export default defineComponent({
         os_number: this.os_number,
         status: this.status,
         defect_obs: this.defect_obs,
+        part_name: this.part_name,
         part_cost: this.part_cost,
+        service_name: this.service_name,
         service_cost: this.service_cost,
         ticket_amount: this.ticket_amount,
       };
-
+      // console.log(ticket);
+      // return;
       if (
         JSON.stringify(useOsHistoryStore().ticket_os) === JSON.stringify(ticket)
       ) {

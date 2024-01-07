@@ -6,6 +6,7 @@ const ServiceHistoryPage = () => import("pages/ServiceHistoryPage.vue");
 const ReportPage = () => import("pages/ReportPage.vue");
 const OsEdit = () => import("components/utils/os_history/CardEditOs.vue");
 const OsCard = () => import("components/utils/os_history/CardOs.vue");
+const MaterialPage = () => import("pages/MaterialPage.vue");
 
 const routes = [
   {
@@ -40,10 +41,17 @@ const routes = [
         name: "os-edit",
         component: OsEdit,
       },
-      { path: "home", component: UpdateUserPage },
+      {
+        path: "home",
+        component: UpdateUserPage,
+      },
       {
         path: "report",
         component: ReportPage,
+      },
+      {
+        path: "material",
+        component: MaterialPage,
       },
     ],
   },

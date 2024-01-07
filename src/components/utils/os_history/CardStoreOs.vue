@@ -173,13 +173,13 @@ export default defineComponent({
       this.model = "";
       useClientStore().clear();
     },
-    async getClientData(name, phone) {
+    async getClientData(name, contact) {
       try {
-        if (!name && !phone) {
+        if (!name && !contact) {
           return false;
         }
 
-        let data = { name, phone };
+        let data = { name, contact };
         // name = name.replace("", "-");
         return await api
           .post(`/client/show`, data, {
@@ -205,19 +205,18 @@ export default defineComponent({
 
         name = name.trimEnd();
         name = name.trimStart();
-        phone = phone.trim();
+        let contact = phone.trim();
 
-        if (!name && !phone) {
+        if (!name && !contact) {
           this.$q.notify({
             type: "warning",
             position: "top",
-            message: "Preencha telefone para encontrar o cliente",
+            message: "Preencha para encontrar o cliente",
             timeout: 1500,
           });
           return;
         }
-
-        let infoClient = await this.getClientData(name, phone);
+        let infoClient = await this.getClientData(name, contact);
 
         if (infoClient) {
           this.client.document = infoClient.document;
@@ -231,7 +230,7 @@ export default defineComponent({
             branch_id: infoClient.branch_id,
             client_id: infoClient.client_id,
             name: infoClient.client_name,
-            phone,
+            contact,
             document: infoClient.document,
             mail: infoClient.mail,
           });
@@ -254,7 +253,7 @@ export default defineComponent({
         if (useClientStore().client.client_id === "") {
           let clientData = {
             name: this.client.name,
-            phone: this.client.phone,
+            contact: this.client.phone,
             document: this.client.document,
             mail: this.client.mail,
           };
@@ -284,7 +283,7 @@ export default defineComponent({
         let osData = {
           client_id: useClientStore().client.client_id | client_id,
           branch_id,
-          created_by: useAuthStore().user_id,
+          created_by_user_id: useAuthStore().user_id,
           product: `${this.form.brand} ${this.form.model}`,
           product_serial,
           status,
@@ -340,11 +339,10 @@ export default defineComponent({
       }
       const data = {
         name: client.name,
-        phone: client.phone,
+        contact: client.phone,
         mail: client.mail,
         document: client.document,
       };
-
       return await api
         .post(`/client/update`, data)
         .then((res) => {
