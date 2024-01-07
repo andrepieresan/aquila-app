@@ -168,12 +168,13 @@ export default {
     });
     return {
       material_modal,
-      reports_modal,
+      reports_modal ,
       os_modal,
       setHeader(header) {
         this.headerTitle.name = header.name;
         this.headerTitle.key = header.key;
       },
+
       setModal(modal) {
         switch (modal) {
           case "material":
@@ -193,7 +194,7 @@ export default {
       drawer,
       userName: "ADONIS",
       userRole: "technical assistance \nmanager",
-      headerTitle: ref({ name: "", key: "" }),
+      headerTitle: ref({name: 'Lista de serviços', key: 'os'  }),
     };
   },
 };
